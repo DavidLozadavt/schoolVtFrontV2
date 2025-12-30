@@ -1,4 +1,6 @@
 import React from "react";
+import Chart from "react-apexcharts"; 
+
 
 // Iconos SVG minimalistas 
 const Icons = {
@@ -26,30 +28,63 @@ const Icons = {
 };
 
 export const DashboardCoordinador: React.FC = () => {
+  // Configuración de la gráfica de asistencia
+  const chartOptions: any = {
+    chart: { type: 'area', toolbar: { show: false }, zoom: { enabled: false } },
+    colors: ['#1B84FF'],
+    fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.3, opacityTo: 0.1 } },
+    dataLabels: { enabled: false },
+    stroke: { curve: 'smooth', width: 2 },
+    xaxis: { categories: ['Lun', 'Mar', 'Mie', 'Jue', 'Vie'], labels: { style: { colors: '#99A1B7' } } },
+    yaxis: { labels: { style: { colors: '#99A1B7' } } },
+    grid: { borderColor: 'rgba(153, 161, 183, 0.1)' }
+  };
+
+  const chartSeries = [{ name: 'Asistencia', data: [88, 94, 91, 95, 94] }];
+
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-coal-500 p-6 lg:p-7.5 font-sans">
       
-      {/* HEADER */}
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-7.5 gap-4">
-        <div>
-          <h1 className="text-2.5xl font-bold text-gray-900 dark:text-gray-900 tracking-tight">
+      {/* HEADER + MINI CALENDARIO */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-7.5 mb-7.5">
+        <header className="flex flex-col justify-center lg:col-span-2">
+          <h1 className="text-2.5xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
             Dashboard Coordinador
           </h1>
           <p className="mt-1 font-medium text-gray-500 text-2sm">
             Edu-Care Sede Principal <span className="mx-1.25 text-gray-300">|</span> Período 2025 <span className="mx-1.25 text-gray-300">|</span> <span className="font-semibold text-primary">Jornada Mañana</span>
           </p>
-        </div>
-        <div className="flex gap-2.75">
-          <button className="text-gray-700 bg-white border border-gray-200 btn btn-sm dark:bg-coal-300 dark:border-coal-100 shadow-light">
-            Filtrar Sede
-          </button>
-          <button className="btn btn-sm btn-primary shadow-primary">
-            Nueva Circular
-          </button>
-        </div>
-      </header>
+          <div className="flex gap-2.75 mt-4">
+            <button className="text-gray-700 bg-white border border-gray-200 btn btn-sm dark:bg-coal-300 dark:border-coal-100 dark:text-gray-400 shadow-light">
+              Filtrar Sede
+            </button>
+            <button className="btn btn-sm btn-primary shadow-primary">
+              Nueva Circular
+            </button>
+          </div>
+        </header>
 
-      {/* KPIs (Sección A*/}
+        {/* MINI CALENDARIO SUPERIOR DERECHA */}
+        <div className="p-4 bg-white border border-gray-200 dark:bg-coal-300 rounded-xl shadow-card dark:border-coal-100">
+          <div className="flex items-center justify-between mb-2">
+            <span className="font-bold text-gray-800 text-2sm dark:text-white">Marzo 2025</span>
+            <div className="flex gap-1">
+              <span className="p-1 text-gray-400 rounded cursor-pointer hover:bg-gray-100 dark:hover:bg-coal-200">‹</span>
+              <span className="p-1 text-gray-400 rounded cursor-pointer hover:bg-gray-100 dark:hover:bg-coal-200">›</span>
+            </div>
+          </div>
+          <div className="grid grid-cols-7 gap-1 font-bold text-center text-gray-400 uppercase text-4xs">
+            {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map(d => <div key={d}>{d}</div>)}
+            {[...Array(31)].map((_, i) => (
+              <div key={i} className={`p-1 text-2xs rounded-md ${i + 1 === 12 ? 'bg-primary text-white' : 'text-gray-600 dark:text-gray-400'}`}>
+                {i + 1}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* KPIs (Sección A) */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7.5 mb-7.5">
         {[
           { title: "Clases Hoy", value: "42", icon: Icons.Calendar, color: "text-primary", bg: "bg-primary-light" },
@@ -57,7 +92,7 @@ export const DashboardCoordinador: React.FC = () => {
           { title: "Docentes sin Reporte", value: "03", icon: Icons.Alert, color: "text-danger", bg: "bg-danger-light" },
           { title: "Estudiantes en Riesgo", value: "18", icon: Icons.Academic, color: "text-warning", bg: "bg-warning-light" },
         ].map((kpi) => (
-          <div key={kpi.title} className="bg-white dark:bg-coal-300 p-7.5 rounded-xl shadow-card border border-gray-200 dark:border-coal-100">
+          <div key={kpi.title} className="bg-white dark:bg-coal-300 p-7.5 rounded-xl shadow-card border border-gray-200 dark:border-coal-100 transition-all hover:scale-105">
             <div className={`w-10 h-10 rounded-lg ${kpi.bg} ${kpi.color} flex items-center justify-center mb-4.5`}>
               <kpi.icon />
             </div>
@@ -69,9 +104,9 @@ export const DashboardCoordinador: React.FC = () => {
         ))}
       </section>
 
-      {/* ALERTAS OPERATIVAS (Sección B -  */}
+      {/* ALERTAS OPERATIVAS (Sección B) */}
       <section className="mb-7.5">
-        <h2 className="text-md font-bold text-gray-800 dark:text-gray-900 mb-4.5">Pendientes de Gestión</h2>
+        <h2 className="text-md font-bold text-gray-800 dark:text-gray-100 mb-4.5">Pendientes de Gestión</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4.5">
           <AlertCard title="Grupos sin planilla" value={5} type="danger" />
           <AlertCard title="Evaluaciones pendientes" value={8} type="warning" />
@@ -80,10 +115,19 @@ export const DashboardCoordinador: React.FC = () => {
         </div>
       </section>
 
-      {/* CONTROL ACADÉMICO (Sección C ) */}
+      {/* CONTROL ACADÉMICO (Sección C - Con Gráfica integrada) */}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-7.5 mb-7.5">
         
-        {/* ASISTENCIA */}
+        {/* GRÁFICA DE ASISTENCIA SEMANAL */}
+        <div className="bg-white dark:bg-coal-300 p-7.5 rounded-xl shadow-card border border-gray-200 dark:border-coal-100">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="font-bold text-gray-900 text-md dark:text-white">Tendencia de Asistencia</h3>
+            <span className="px-2 py-1 font-bold rounded text-2xs text-success bg-success-light">Semana Actual</span>
+          </div>
+          <Chart options={chartOptions} series={chartSeries} type="area" height={200} />
+        </div>
+
+        {/* ASISTENCIA POR GRADO */}
         <div className="bg-white dark:bg-coal-300 p-7.5 rounded-xl shadow-card border border-gray-200 dark:border-coal-100">
           <div className="flex justify-between items-center mb-6.5">
             <h3 className="font-bold text-gray-900 text-md dark:text-white">Asistencia por Grado</h3>
@@ -97,34 +141,12 @@ export const DashboardCoordinador: React.FC = () => {
             ].map((item) => (
               <div key={item.label}>
                 <div className="flex justify-between mb-2 font-semibold text-2sm">
-                  <span className="text-gray-700 dark:text-gray-800">{item.label}</span>
+                  <span className="text-gray-700 dark:text-gray-400">{item.label}</span>
                   <span className="text-gray-500">{item.p}%</span>
                 </div>
                 <div className="h-1.5 w-full bg-gray-200 dark:bg-coal-200 rounded-progress overflow-hidden">
                   <div className={`h-full ${item.color}`} style={{ width: `${item.p}%` }}></div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* RENDIMIENTO */}
-        <div className="bg-white dark:bg-coal-300 p-7.5 rounded-xl shadow-card border border-gray-200 dark:border-coal-100">
-          <h3 className="text-md font-bold text-gray-900 dark:text-white mb-6.5">Alertas de Rendimiento</h3>
-          <div className="divide-y divide-gray-100 dark:divide-coal-100">
-            {[
-              { label: "Docentes con notas pendientes", val: 6, sub: "Matemáticas, Física" },
-              { label: "Asignaturas en riesgo", val: 4, sub: "Promedio < 3.0" },
-              { label: "Cierres de periodo faltantes", val: 2, sub: "Grados 10° y 11°" }
-            ].map((row, idx) => (
-              <div key={idx} className="flex items-center justify-between py-4">
-                <div>
-                  <p className="font-bold text-gray-800 text-2sm dark:text-white">{row.label}</p>
-                  <p className="font-medium text-gray-500 text-2xs">{row.sub}</p>
-                </div>
-                <span className="bg-secondary-light text-secondary-inverse px-2.75 py-1.25 rounded-md text-2xs font-bold">
-                  {row.val}
-                </span>
               </div>
             ))}
           </div>
@@ -136,7 +158,8 @@ export const DashboardCoordinador: React.FC = () => {
         <h2 className="mb-6 font-bold tracking-widest text-gray-400 uppercase text-2xs">Acciones de Gestión</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4.5">
           {["Caso Convivencia", "Abrir Seguimiento", "Exportar Riesgo", "Listados"].map((label) => (
-            <button key={label} className="flex items-center justify-center p-4.5 rounded-xl border-2 border-dashed border-gray-200 dark:border-coal-100 text-gray-600 dark:text-gray-700 font-bold text-2sm hover:bg-primary-light hover:border-primary hover:text-primary transition-all">
+            <button key={label} className="flex flex-col items-center justify-center p-4.5 rounded-xl border-2 border-dashed border-gray-200 dark:border-coal-100 text-gray-600 dark:text-gray-400 font-bold text-2sm hover:bg-primary-light hover:border-primary hover:text-primary transition-all gap-2">
+              <span className="text-lg">⊕</span>
               {label}
             </button>
           ))}
@@ -146,7 +169,7 @@ export const DashboardCoordinador: React.FC = () => {
   );
 };
 
-/* COMPONENTE INTERNO: Tarjeta de Alerta*/
+/* COMPONENTE INTERNO: Tarjeta de Alerta */
 const AlertCard = ({ title, value, type }: { title: string; value: number; type: 'danger' | 'warning' }) => {
   const styles = {
     danger: "bg-danger-light text-danger border-danger-clarity",
@@ -154,11 +177,11 @@ const AlertCard = ({ title, value, type }: { title: string; value: number; type:
   };
 
   return (
-    <div className={`${styles[type]} p-5 rounded-xl border flex flex-col justify-between hover:smooth-bounce cursor-pointer transition-all`}>
+    <div className={`${styles[type]} p-5 rounded-xl border flex flex-col justify-between hover:scale-105 cursor-pointer transition-all duration-300`}>
       <span className="mb-2 font-bold tracking-wider uppercase text-2xs opacity-90">{title}</span>
       <div className="flex items-end justify-between">
-        <span className="text-1.5xl font-black">{value}</span>
-        <span className="text-4xs font-bold bg-white bg-opacity-40 px-1.75 py-0.75 rounded uppercase shadow-sm">
+        <span className="text-2.5xl font-black">{value}</span>
+        <span className="text-4xs font-bold bg-white dark:bg-black dark:bg-opacity-20 bg-opacity-40 px-1.75 py-0.75 rounded uppercase shadow-sm">
           Atender
         </span>
       </div>
