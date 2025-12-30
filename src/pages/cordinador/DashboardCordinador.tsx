@@ -1,8 +1,6 @@
 import React from "react";
 import Chart from "react-apexcharts"; 
 
-
-// Iconos SVG minimalistas 
 const Icons = {
   Academic: () => (
     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -28,7 +26,6 @@ const Icons = {
 };
 
 export const DashboardCoordinador: React.FC = () => {
-  // Configuración de la gráfica de asistencia
   const chartOptions: any = {
     chart: { type: 'area', toolbar: { show: false }, zoom: { enabled: false } },
     colors: ['#1B84FF'],
@@ -45,44 +42,25 @@ export const DashboardCoordinador: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-coal-500 p-6 lg:p-7.5 font-sans">
       
-      {/* HEADER + MINI CALENDARIO */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-7.5 mb-7.5">
-        <header className="flex flex-col justify-center lg:col-span-2">
+      {/* HEADER - Ahora a ancho completo */}
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-7.5 gap-4">
+        <div>
           <h1 className="text-2.5xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
             Dashboard Coordinador
           </h1>
           <p className="mt-1 font-medium text-gray-500 text-2sm">
             Edu-Care Sede Principal <span className="mx-1.25 text-gray-300">|</span> Período 2025 <span className="mx-1.25 text-gray-300">|</span> <span className="font-semibold text-primary">Jornada Mañana</span>
           </p>
-          <div className="flex gap-2.75 mt-4">
-            <button className="text-gray-700 bg-white border border-gray-200 btn btn-sm dark:bg-coal-300 dark:border-coal-100 dark:text-gray-400 shadow-light">
-              Filtrar Sede
-            </button>
-            <button className="btn btn-sm btn-primary shadow-primary">
-              Nueva Circular
-            </button>
-          </div>
-        </header>
-
-        {/* MINI CALENDARIO SUPERIOR DERECHA */}
-        <div className="p-4 bg-white border border-gray-200 dark:bg-coal-300 rounded-xl shadow-card dark:border-coal-100">
-          <div className="flex items-center justify-between mb-2">
-            <span className="font-bold text-gray-800 text-2sm dark:text-white">Marzo 2025</span>
-            <div className="flex gap-1">
-              <span className="p-1 text-gray-400 rounded cursor-pointer hover:bg-gray-100 dark:hover:bg-coal-200">‹</span>
-              <span className="p-1 text-gray-400 rounded cursor-pointer hover:bg-gray-100 dark:hover:bg-coal-200">›</span>
-            </div>
-          </div>
-          <div className="grid grid-cols-7 gap-1 font-bold text-center text-gray-400 uppercase text-4xs">
-            {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map(d => <div key={d}>{d}</div>)}
-            {[...Array(31)].map((_, i) => (
-              <div key={i} className={`p-1 text-2xs rounded-md ${i + 1 === 12 ? 'bg-primary text-white' : 'text-gray-600 dark:text-gray-400'}`}>
-                {i + 1}
-              </div>
-            ))}
-          </div>
         </div>
-      </div>
+        <div className="flex gap-2.75">
+          <button className="text-gray-700 bg-white border border-gray-200 btn btn-sm dark:bg-coal-300 dark:border-coal-100 dark:text-gray-400 shadow-light">
+            Filtrar Sede
+          </button>
+          <button className="btn btn-sm btn-primary shadow-primary">
+            Nueva Circular
+          </button>
+        </div>
+      </header>
 
       {/* KPIs (Sección A) */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7.5 mb-7.5">
@@ -115,29 +93,30 @@ export const DashboardCoordinador: React.FC = () => {
         </div>
       </section>
 
-      {/* CONTROL ACADÉMICO (Sección C - Con Gráfica integrada) */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-7.5 mb-7.5">
+      {/* CONTROL ACADÉMICO + CALENDARIO (Sección C) */}
+      <section className="grid grid-cols-1 lg:grid-cols-3 gap-7.5 mb-7.5">
         
         {/* GRÁFICA DE ASISTENCIA SEMANAL */}
-        <div className="bg-white dark:bg-coal-300 p-7.5 rounded-xl shadow-card border border-gray-200 dark:border-coal-100">
+        <div className="bg-white dark:bg-coal-300 p-7.5 rounded-xl shadow-card border border-gray-200 dark:border-coal-100 lg:col-span-1">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="font-bold text-gray-900 text-md dark:text-white">Tendencia de Asistencia</h3>
+            <h3 className="font-bold text-gray-900 text-md dark:text-white">Tendencia</h3>
             <span className="px-2 py-1 font-bold rounded text-2xs text-success bg-success-light">Semana Actual</span>
           </div>
-          <Chart options={chartOptions} series={chartSeries} type="area" height={200} />
+          <Chart options={chartOptions} series={chartSeries} type="area" height={220} />
         </div>
 
         {/* ASISTENCIA POR GRADO */}
-        <div className="bg-white dark:bg-coal-300 p-7.5 rounded-xl shadow-card border border-gray-200 dark:border-coal-100">
+        <div className="bg-white dark:bg-coal-300 p-7.5 rounded-xl shadow-card border border-gray-200 dark:border-coal-100 lg:col-span-1">
           <div className="flex justify-between items-center mb-6.5">
             <h3 className="font-bold text-gray-900 text-md dark:text-white">Asistencia por Grado</h3>
             <span className="font-bold uppercase cursor-pointer text-primary text-2xs hover:underline">Ver Reporte</span>
           </div>
-          <div className="space-y-5.5">
+          <div className="space-y-6">
             {[
               { label: "Grado 6° A", p: 92, color: "bg-success" },
               { label: "Grado 7° B", p: 85, color: "bg-primary" },
-              { label: "Grado 8° C", p: 68, color: "bg-danger" }
+              { label: "Grado 8° C", p: 68, color: "bg-danger" },
+              { label: "Grado 9° A", p: 95, color: "bg-success" }
             ].map((item) => (
               <div key={item.label}>
                 <div className="flex justify-between mb-2 font-semibold text-2sm">
@@ -147,6 +126,25 @@ export const DashboardCoordinador: React.FC = () => {
                 <div className="h-1.5 w-full bg-gray-200 dark:bg-coal-200 rounded-progress overflow-hidden">
                   <div className={`h-full ${item.color}`} style={{ width: `${item.p}%` }}></div>
                 </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* MINI CALENDARIO (Ahora debajo de la línea del header, a la derecha) */}
+        <div className="flex flex-col justify-center p-6 bg-white border border-gray-200 dark:bg-coal-300 rounded-xl shadow-card dark:border-coal-100 lg:col-span-1">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-bold tracking-wider text-gray-800 uppercase dark:text-white">Marzo 2025</span>
+            <div className="flex gap-2">
+              <span className="p-1.5 text-gray-400 rounded cursor-pointer hover:bg-gray-100 dark:hover:bg-coal-200 transition-colors">‹</span>
+              <span className="p-1.5 text-gray-400 rounded cursor-pointer hover:bg-gray-100 dark:hover:bg-coal-200 transition-colors">›</span>
+            </div>
+          </div>
+          <div className="grid grid-cols-7 gap-1 mb-2 font-bold text-center text-gray-400 uppercase text-4xs">
+            {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map(d => <div key={d} className="py-1">{d}</div>)}
+            {[...Array(31)].map((_, i) => (
+              <div key={i} className={`py-2 text-2sm rounded-md transition-all cursor-pointer hover:bg-primary-light hover:text-primary ${i + 1 === 12 ? 'bg-primary text-white shadow-primary' : 'text-gray-600 dark:text-gray-400'}`}>
+                {i + 1}
               </div>
             ))}
           </div>
@@ -169,7 +167,6 @@ export const DashboardCoordinador: React.FC = () => {
   );
 };
 
-/* COMPONENTE INTERNO: Tarjeta de Alerta */
 const AlertCard = ({ title, value, type }: { title: string; value: number; type: 'danger' | 'warning' }) => {
   const styles = {
     danger: "bg-danger-light text-danger border-danger-clarity",
