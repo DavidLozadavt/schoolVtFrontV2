@@ -45,21 +45,21 @@ export const DashboardCoordinador: React.FC = () => {
       {/* HEADER - Ahora a ancho completo */}
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-7.5 gap-4">
         <div>
-          <h1 className="text-2.5xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
+          <h1 className="text-2.5xl font-bold text-gray-900 dark:text-gray-800 tracking-tight">
             Dashboard Coordinador
           </h1>
           <p className="mt-1 font-medium text-gray-500 text-2sm">
             Edu-Care Sede Principal <span className="mx-1.25 text-gray-300">|</span> Período 2025 <span className="mx-1.25 text-gray-300">|</span> <span className="font-semibold text-primary">Jornada Mañana</span>
           </p>
         </div>
-        <div className="flex gap-2.75">
+       {/*  <div className="flex gap-2.75">
           <button className="text-gray-700 bg-white border border-gray-200 btn btn-sm dark:bg-coal-300 dark:border-coal-100 dark:text-gray-400 shadow-light">
             Filtrar Sede
           </button>
           <button className="btn btn-sm btn-primary shadow-primary">
             Nueva Circular
           </button>
-        </div>
+        </div>*/}
       </header>
 
       {/* KPIs (Sección A) */}
