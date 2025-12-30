@@ -93,12 +93,12 @@ import { CobrosPolizasPage } from '@/pages/cobros-polizas';
 import MultimediaPage from '@/pages/multimedia/gestion-multimedia/MultimediaPage';
 
 // Componentes temporales para pruebas
-const ProgramasPage = () => <div className="p-8"><h2>Gestión de Programas - Próximamente</h2></div>;
 const PeriodosPage = () => <div className="p-8"><h2>Gestión de Periodos - Próximamente</h2></div>;
 const JornadasPage = () => <div className="p-8"><h2>Gestión de Jornadas - Próximamente</h2></div>;
 const InfraestructuraPage = () => <div className="p-8"><h2>Gestión de Infraestructura - Próximamente</h2></div>;
 
 import DashboardCoordinador from '@/pages/cordinador/DashboardCordinador';
+import GestionProgramas from '@/pages/programas-academicos/GestionProgramas';
 
 // Configuración de prioridades de Dashboards
 // El orden importa: el primero que coincida será el que se muestre.
@@ -766,7 +766,7 @@ const AppRoutingSetup = (): ReactElement => {
             path="/gestion-academica/configuracion/programas"
             element={
               <ProtectedRoute requiredPermissions={['GESTION_COORDINADOR']}>
-                <DashboardCoordinador />
+                <GestionProgramas/>
               </ProtectedRoute>
             }
           />
