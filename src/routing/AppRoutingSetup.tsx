@@ -91,6 +91,7 @@ import { ConfigurarAsientosPage } from '@/pages/configurar-asientos';
 import { AhorroTerceroPage } from '@/pages/ahorro-tercero';
 import { CobrosPolizasPage } from '@/pages/cobros-polizas';
 import MultimediaPage from '@/pages/multimedia/gestion-multimedia/MultimediaPage';
+import ProfesoresPage from '@/pages/profesores/profes/ProfesoresPage';
 
 const AppRoutingSetup = (): ReactElement => {
   return (
@@ -711,7 +712,7 @@ const AppRoutingSetup = (): ReactElement => {
             }
           />
 
-         <Route
+          <Route
             path="/cobros-polizas/cobros-polizas"
             element={
               <ProtectedRoute requiredPermissions={['GESTION_CUENTAS_PENDIENTES']}>
@@ -719,7 +720,6 @@ const AppRoutingSetup = (): ReactElement => {
               </ProtectedRoute>
             }
           />
-
 
           <Route
             path="/multimedia/gestion-multimedia"
@@ -739,7 +739,7 @@ const AppRoutingSetup = (): ReactElement => {
             }
           />
 
-            <Route
+          <Route
             path="/facturacion-electronica/facturacion-electronica"
             element={
               <ProtectedRoute requiredPermissions={['GESTION_FACTURACION_ELECTRONICA']}>
@@ -756,7 +756,7 @@ const AppRoutingSetup = (): ReactElement => {
             }
           />
 
-            <Route
+          <Route
             path="/tarifas/tarifas"
             element={
               <ProtectedRoute requiredPermissions={['GESTION_TARIFAS']}>
@@ -764,10 +764,6 @@ const AppRoutingSetup = (): ReactElement => {
               </ProtectedRoute>
             }
           />
-
-
-          
-          
 
           <Route
             path="/gestion-productos/configuracion-producto"
@@ -793,7 +789,7 @@ const AppRoutingSetup = (): ReactElement => {
               </ProtectedRoute>
             }
           />
-            <Route
+          <Route
             path="/configuracion/asientos"
             element={
               <ProtectedRoute requiredPermissions={['GESTION_CONFIGURACION_ASIENTOS']}>
@@ -816,6 +812,14 @@ const AppRoutingSetup = (): ReactElement => {
             element={
               <ProtectedRoute requiredPermissions={['GESTION_USUARIO']}>
                 <SolicitudAlmacenPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profesores"
+            element={
+              <ProtectedRoute requiredPermissions={['GESTION_USUARIO']}>
+                <ProfesoresPage />
               </ProtectedRoute>
             }
           />

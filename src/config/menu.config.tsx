@@ -23,8 +23,6 @@ export const MENU_SIDEBAR: TMenuConfig = [
     ]
   },
 
-  
-
   {
     title: 'Gestión Laboral',
     icon: 'tablet-text-down',
@@ -114,12 +112,9 @@ export const MENU_SIDEBAR: TMenuConfig = [
       },
 
       {
-        
         title: 'Facturacion Electronica',
         path: '/facturacion-electronica/facturacion-electronica',
         requiredPermissions: ['GESTION_FACTURACION_ELECTRONICA']
-    
-       
       },
       {
         title: 'Ahorros Terceros',
@@ -264,36 +259,33 @@ export const MENU_SIDEBAR: TMenuConfig = [
             requiredPermissions: ['GESTION_CONFIGURACION_SALIDA']
           },
           {
-          title: 'Detalles Revision',
-          path: '/detalles/detalles-revision',
-          requiredPermissions: ['GESTION_DETALLES_REVISION']
+            title: 'Detalles Revision',
+            path: '/detalles/detalles-revision',
+            requiredPermissions: ['GESTION_DETALLES_REVISION']
           },
-            {
-          title: 'Revision Vehiculos',
-          path: '/trasporte/revision-vehiculos',
-          requiredPermissions: ['GESTION_REVISION_PREOPERACIONAL']
+          {
+            title: 'Revision Vehiculos',
+            path: '/trasporte/revision-vehiculos',
+            requiredPermissions: ['GESTION_REVISION_PREOPERACIONAL']
           },
 
           {
             title: 'Descuentos de Planilla',
             path: '/transporte/descuentos-planilla',
             requiredPermissions: ['GESTION_DESCUENTOS_PLANILLA']
-          }, 
+          },
 
           {
             title: 'Configuración de Asientos',
             path: '/configuracion/asientos',
             requiredPermissions: ['GESTION_CONFIGURACION_ASIENTOS']
-          }, 
+          },
 
-             {
+          {
             title: 'Tarifas',
             path: '/tarifas/tarifas',
             requiredPermissions: ['GESTION_TARIFAS']
-          }, 
-
-
-
+          }
         ]
       },
       {
@@ -526,7 +518,6 @@ export const MENU_SIDEBAR: TMenuConfig = [
     ]
   },
 
-
   {
     title: 'Multimedia',
     icon: 'picture',
@@ -535,7 +526,7 @@ export const MENU_SIDEBAR: TMenuConfig = [
         title: 'Gestion Multimedia',
         path: '/multimedia/gestion-multimedia',
         requiredPermissions: ['GESTION_NOMINA']
-      },
+      }
     ]
   },
 
@@ -616,6 +607,18 @@ export const MENU_SIDEBAR: TMenuConfig = [
       {
         title: 'Reporte Superintendencia',
         path: '/reporte-superintendencia/reporte-superintendencia',
+        requiredPermissions: ['GESTION_REPORTE_SUPERINTENDENCIA']
+      }
+    ]
+  },
+
+  {
+    title: 'Prueba Dashboard',
+    icon: 'book',
+    children: [
+      {
+        title: 'Profesor',
+        path: '/profesores',
         requiredPermissions: ['GESTION_REPORTE_SUPERINTENDENCIA']
       }
     ]
