@@ -3,7 +3,7 @@ import { Navigate, Route, Routes } from 'react-router';
 import { DefaultPage } from '@/pages/dashboards';
 import { AccountRolesPage } from '@/pages/account';
 
-import { AuthPage } from '@/auth';
+import { AuthPage, useAuthContext } from '@/auth';
 import { RequireAuth } from '@/auth/RequireAuth';
 import { Demo1Layout } from '@/layouts/demo1';
 import { ErrorsRouting } from '@/errors';
@@ -100,13 +100,45 @@ const InfraestructuraPage = () => <div className="p-8"><h2>Gestión de Infraestr
 
 import DashboardCoordinador from '@/pages/cordinador/DashboardCordinador';
 
+// Configuración de prioridades de Dashboards
+// El orden importa: el primero que coincida será el que se muestre.
+const DASHBOARD_CONFIG = [
+  { 
+    permission: 'GESTION_RECTOR', 
+    component: <div className="p-8"><h2>Dashboard de Rectoría - Próximamente</h2></div> 
+  },
+  { 
+    permission: 'GESTION_COORDINADOR', 
+    component: <DashboardCoordinador /> 
+  },
+  { 
+    permission: 'GESTION_PROFESOR', 
+    component: <div className="p-8"><h2>Dashboard de Docente - Próximamente</h2></div> 
+  },
+  { 
+    permission: 'GESTION_ESTUDIANTE', 
+    component: <div className="p-8"><h2>Dashboard de Estudiante - Próximamente</h2></div> 
+  }
+];
 const AppRoutingSetup = (): ReactElement => {
+
+  const { permissions } = useAuthContext();  
+  
+  // Función lógica para seleccionar el dashboard
+  const getActiveDashboard = () => {
+    const active = DASHBOARD_CONFIG.find(item => 
+      permissions?.includes(item.permission)
+    );
+
+    // Si hay coincidencia retornamos su componente, si no, el DefaultPage original
+    return active ? active.component : <DefaultPage />;
+  };
+  
   return (
     <Routes>
       <Route element={<RequireAuth />}>
         <Route element={<Demo1Layout />}>
-          <Route path="/" element={<DefaultPage />} />
-
+          <Route path="/" element={getActiveDashboard()} />
           <Route
             path="gestion-usuarios/usuarios"
             element={
@@ -719,7 +751,7 @@ const AppRoutingSetup = (): ReactElement => {
             }
           />
 
-         <Route
+          <Route
             path="/cobros-polizas/cobros-polizas"
             element={
               <ProtectedRoute requiredPermissions={['GESTION_CUENTAS_PENDIENTES']}>
@@ -729,40 +761,40 @@ const AppRoutingSetup = (): ReactElement => {
           />
 
 
-        {/* --- SECCIÓN GESTIÓN ACADÉMICA --- */}
-<Route
-  path="/gestion-academica/configuracion/programas"
-  element={
-    <ProtectedRoute requiredPermissions={['GESTION_COORDINADOR']}>
-      <DashboardCoordinador />
-    </ProtectedRoute>
-  }
-/>
+          {/* --- SECCIÓN GESTIÓN ACADÉMICA --- */}
+          <Route
+            path="/gestion-academica/configuracion/programas"
+            element={
+              <ProtectedRoute requiredPermissions={['GESTION_COORDINADOR']}>
+                <DashboardCoordinador />
+              </ProtectedRoute>
+            }
+          />
 
-<Route
-  path="/gestion-academica/configuracion/periodos"
-  element={
-    <ProtectedRoute requiredPermissions={['GESTION_COORDINADOR']}>
-      <PeriodosPage />
-    </ProtectedRoute>
-  }
-/>
-<Route
-  path="/gestion-academica/configuracion/infraestructura"
-  element={
-    <ProtectedRoute requiredPermissions={['GESTION_COORDINADOR']}>
-      <InfraestructuraPage />
-    </ProtectedRoute>
-  }
-/>
-<Route
-  path="/gestion-academica/configuracion/jornadas"
-  element={
-    <ProtectedRoute requiredPermissions={['GESTION_CORDINADOR']}>
-      <JornadasPage />
-    </ProtectedRoute>
-  }
-/>
+          <Route
+            path="/gestion-academica/configuracion/periodos"
+            element={
+              <ProtectedRoute requiredPermissions={['GESTION_COORDINADOR']}>
+                <PeriodosPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/gestion-academica/configuracion/infraestructura"
+            element={
+              <ProtectedRoute requiredPermissions={['GESTION_COORDINADOR']}>
+                <InfraestructuraPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/gestion-academica/configuracion/jornadas"
+            element={
+              <ProtectedRoute requiredPermissions={['GESTION_CORDINADOR']}>
+                <JornadasPage />
+              </ProtectedRoute>
+            }
+          />
 
 
 
@@ -786,7 +818,7 @@ const AppRoutingSetup = (): ReactElement => {
             }
           />
 
-            <Route
+          <Route
             path="/facturacion-electronica/facturacion-electronica"
             element={
               <ProtectedRoute requiredPermissions={['GESTION_FACTURACION_ELECTRONICA']}>
@@ -803,7 +835,7 @@ const AppRoutingSetup = (): ReactElement => {
             }
           />
 
-            <Route
+          <Route
             path="/tarifas/tarifas"
             element={
               <ProtectedRoute requiredPermissions={['GESTION_TARIFAS']}>
@@ -813,8 +845,8 @@ const AppRoutingSetup = (): ReactElement => {
           />
 
 
-          
-          
+
+
 
           <Route
             path="/gestion-productos/configuracion-producto"
@@ -840,7 +872,7 @@ const AppRoutingSetup = (): ReactElement => {
               </ProtectedRoute>
             }
           />
-            <Route
+          <Route
             path="/configuracion/asientos"
             element={
               <ProtectedRoute requiredPermissions={['GESTION_CONFIGURACION_ASIENTOS']}>
