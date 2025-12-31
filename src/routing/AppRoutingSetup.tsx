@@ -100,6 +100,7 @@ const InfraestructuraPage = () => <div className="p-8"><h2>Gestión de Infraestr
 
 import DashboardCoordinador from '@/pages/cordinador/DashboardCordinador';
 import GestionProgramas from '@/pages/programas-academicos/GestionProgramas';
+import EstudiantesPage from '@/pages/estudiantes/EstudiantesPage';
 
 // Configuración de prioridades de Dashboards
 // El orden importa: el primero que coincida será el que se muestre.
@@ -865,6 +866,14 @@ const AppRoutingSetup = (): ReactElement => {
             element={
               <ProtectedRoute requiredPermissions={['GESTION_USUARIO']}>
                 <ProfesoresPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/estudiantes"
+            element={
+              <ProtectedRoute requiredPermissions={['GESTION_USUARIO']}>
+                <EstudiantesPage />
               </ProtectedRoute>
             }
           />
