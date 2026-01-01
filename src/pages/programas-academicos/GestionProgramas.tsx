@@ -22,18 +22,13 @@ const GestionProgramas: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
 
-  // El ancho real de desplazamiento: tarjeta(300px) + gap(32px) = 332px
-  const scrollAmount = 332;
+  const scrollAmount = 292;
 
   const scroll = (direction: 'left' | 'right') => {
     if (carouselRef.current) {
       const currentScroll = carouselRef.current.scrollLeft;
       const targetScroll = direction === 'left' ? currentScroll - scrollAmount : currentScroll + scrollAmount;
-      
-      carouselRef.current.scrollTo({
-        left: targetScroll,
-        behavior: 'smooth',
-      });
+      carouselRef.current.scrollTo({ left: targetScroll, behavior: 'smooth' });
     }
   };
 
@@ -45,7 +40,7 @@ const GestionProgramas: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col w-full min-h-screen p-6 lg:p-7.5 bg-[#f3f4f7] dark:bg-coal-500 font-sans">
+    <div className="flex flex-col w-full h-screen max-h-screen p-4 lg:p-6 bg-[#f3f4f7] dark:bg-coal-500 font-sans overflow-hidden">
       
       <style>{`
         .container-3d { perspective: 1200px; }
@@ -58,145 +53,109 @@ const GestionProgramas: React.FC = () => {
         .face { 
           position: absolute; width: 100%; height: 100%; 
           -webkit-backface-visibility: hidden; backface-visibility: hidden; 
-          border-radius: 2rem; overflow: hidden;
+          border-radius: 1.5rem; overflow: hidden;
         }
         .face-back { 
           transform: rotateY(180deg); 
           background: #f0f0f3;
-          box-shadow: inset 5px 5px 10px #d1d1d6, inset -5px -5px 10px #ffffff;
         }
+        .dark .face-back { background: #1e1e20; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        .btn-manage {
+          transition: all 0.3s ease;
+          border: 1px solid transparent;
+        }
+        .btn-manage:hover {
+          border-color: #6366f1;
+          background: #ffffff;
+          transform: translateY(-2px);
+        }
+        .dark .btn-manage:hover {
+          box-shadow: 0 0 12px rgba(99, 102, 241, 0.5);
+          border-color: rgba(99, 102, 241, 0.6);
+          background: #2a2a2d;
+        }
       `}</style>
 
-      {/* Botón Añadir Neomórfico - Mejorado */}
-      <div className="flex justify-start mb-8">
-        <button className="flex items-center gap-3 px-8 py-4 bg-[#f0f0f3] text-[#6366f1] rounded-2xl font-bold uppercase tracking-widest shadow-[6px_6px_12px_#ced1d9,-6px_-6px_12px_#ffffff] hover:shadow-[inset_4px_4px_8px_#ced1d9,inset_-4px_-4px_8px_#ffffff] transition-all active:scale-95">
-          <div className="flex items-center justify-center w-6 h-6 bg-[#6366f1] text-white rounded-full">
-            <i className="text-sm ki-filled ki-plus"></i>
+      {/* Botón Añadir */}
+      <div className="flex justify-start mb-4">
+        <button className="flex items-center gap-3 px-6 py-3 rounded-xl font-bold uppercase tracking-widest transition-all active:scale-95 bg-[#6366f1] text-white shadow-lg hover:bg-[#4f46e5] dark:bg-coal-400 dark:text-[#6366f1]">
+          <div className="flex items-center justify-center w-5 h-5 rounded-full bg-white/20">
+            <i className="text-xs ki-filled ki-plus"></i>
           </div>
-          <span>Añadir Programa</span>
+          <span className="text-xs">Añadir Programa</span>
         </button>
       </div>
 
-      {/* Área del Carrusel */}
-      <div className="relative w-full max-w-[1200px] mx-auto">
-        
-        {/* Flechas de Navegación - Z-Index alto para asegurar clic */}
-        <button 
-          onClick={() => scroll('left')}
-          className="absolute left-[-20px] top-1/2 -translate-y-1/2 z-50 w-12 h-12 flex items-center justify-center bg-white rounded-full shadow-lg border border-gray-100 hover:scale-110 active:bg-gray-50 transition-all"
-        >
-          <i className="text-2xl text-gray-700 ki-outline ki-left"></i>
-        </button>
+      <div className="relative w-full max-w-[1100px] mx-auto flex-grow flex items-center">
+        <button onClick={() => scroll('left')} className="absolute left-[-15px] z-50 w-10 h-10 flex items-center justify-center bg-white dark:bg-coal-300 rounded-full shadow-md hover:scale-110 active:shadow-inner transition-all"><i className="text-xl ki-outline ki-left"></i></button>
+        <button onClick={() => scroll('right')} className="absolute right-[-15px] z-50 w-10 h-10 flex items-center justify-center bg-white dark:bg-coal-300 rounded-full shadow-md hover:scale-110 active:shadow-inner transition-all"><i className="text-xl ki-outline ki-right"></i></button>
 
-        <button 
-          onClick={() => scroll('right')}
-          className="absolute right-[-20px] top-1/2 -translate-y-1/2 z-50 w-12 h-12 flex items-center justify-center bg-white rounded-full shadow-lg border border-gray-100 hover:scale-110 active:bg-gray-50 transition-all"
-        >
-          <i className="text-2xl text-gray-700 ki-outline ki-right"></i>
-        </button>
-
-        {/* Track del Carrusel */}
-        <div 
-          ref={carouselRef}
-          onScroll={handleScroll}
-          className="flex gap-8 px-4 py-12 overflow-x-auto no-scrollbar snap-x snap-mandatory"
-        >
-          {programs.map((program, idx) => {
-            const isCenter = idx === activeIndex;
-            return (
-              <div 
-                key={program.id}
-                className={`container-3d flex-shrink-0 snap-center w-[300px] h-[420px] group transition-transform duration-500
-                  ${isCenter ? 'scale-105' : 'scale-100'}
-                `}
-              >
-                <div className="shadow-xl card-inner">
-                  
-                  {/* FRENTE: Imagen Sólida (Sin transparencia) */}
-                  <div className="relative face face-front">
-                    <img 
-                      src={program.imageUrl} 
-                      alt={program.name} 
-                      className="absolute inset-0 object-cover w-full h-full"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
-                    
-                    <div className="absolute inset-0 flex flex-col justify-end p-8">
-                      <div className="mb-4">
-                        <span className="px-5 py-2 font-bold text-white uppercase rounded-2xl text-[10px] bg-[#6366f1]">
-                          Programa
-                        </span>
-                      </div>
-                      <h3 className="mb-1 text-2xl font-black tracking-tight text-white uppercase">
-                        {program.name}
-                      </h3>
-                      <p className="font-bold tracking-widest uppercase text-white/70 text-[10px]">
-                        {program.status}
-                      </p>
-                    </div>
+        <div ref={carouselRef} onScroll={handleScroll} className="flex w-full gap-8 px-2 py-6 overflow-x-auto no-scrollbar snap-x snap-mandatory">
+          {programs.map((program, idx) => (
+            <div key={program.id} className={`container-3d flex-shrink-0 snap-center w-[260px] h-[360px] group transition-transform duration-500 ${idx === activeIndex ? 'scale-105' : 'scale-100'}`}>
+              <div className="shadow-lg card-inner">
+                
+                {/* FRENTE con borde sutil */}
+                <div className="relative border face face-front border-gray-200/50 dark:border-transparent">
+                  <img src={program.imageUrl} alt={program.name} className="absolute inset-0 object-cover w-full h-full" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                  <div className="absolute inset-0 flex flex-col justify-end p-6">
+                    <span className="w-fit px-3 py-1 mb-2 font-bold text-white uppercase rounded-lg text-[9px] bg-[#6366f1]">Programa</span>
+                    <h3 className="text-lg font-black leading-tight text-white uppercase">{program.name}</h3>
+                    <p className="font-bold text-white/60 text-[9px] uppercase tracking-widest">{program.status}</p>
                   </div>
-
-                  {/* REVERSO: Gestión e Información (Estilo Imagen 10) */}
-                  <div className="flex flex-col p-8 face face-back dark:bg-coal-400">
-                    {/* Header icons */}
-                    <div className="flex justify-between mb-8 text-gray-400">
-                      <i className="text-xl ki-outline ki-exit-right"></i>
-                      <i className="text-xl ki-outline ki-book"></i>
-                      <i className="text-xl ki-outline ki-setting-2"></i>
-                      <i className="text-xl ki-outline ki-files"></i>
-                    </div>
-
-                    {/* Content */}
-                    <div className="flex-grow space-y-5">
-                      <div className="flex flex-col">
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Código:</span>
-                        <span className="text-sm font-bold text-gray-800 dark:text-gray-100">{program.codigo}</span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Nivel:</span>
-                        <span className="text-sm font-bold text-gray-800 dark:text-gray-100">{program.nivel}</span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Formación:</span>
-                        <span className="text-sm font-bold text-gray-800 dark:text-gray-100">{program.formacion}</span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Estado:</span>
-                        <span className="text-sm font-bold text-success">{program.status}</span>
-                      </div>
-                    </div>
-
-                    {/* Acciones Neomórficas */}
-                    <div className="flex justify-between gap-3 pt-6 border-t border-gray-200">
-                      <button className="flex-1 py-3 bg-[#f0f0f3] rounded-xl shadow-[4px_4px_8px_#d1d1d6,-4px_-4px_8px_#ffffff] hover:shadow-inner text-gray-600 transition-all">
-                        <i className="ki-outline ki-arrows-loop"></i>
-                      </button>
-                      <button className="flex-1 py-3 bg-[#f0f0f3] rounded-xl shadow-[4px_4px_8px_#d1d1d6,-4px_-4px_8px_#ffffff] hover:shadow-inner text-danger transition-all">
-                        <i className="ki-outline ki-trash"></i>
-                      </button>
-                      <button className="flex-1 py-3 bg-[#f0f0f3] rounded-xl shadow-[4px_4px_8px_#d1d1d6,-4px_-4px_8px_#ffffff] hover:shadow-inner text-[#6366f1] transition-all">
-                        <i className="ki-outline ki-eye"></i>
-                      </button>
-                    </div>
-                  </div>
-
                 </div>
+
+                {/* REVERSO */}
+                <div className="flex flex-col p-6 border border-white shadow-inner face face-back dark:border-coal-300">
+                  {/* Botones Superiores Mejorados */}
+                  <div className="flex justify-between mb-4">
+                    <button title="Periodos abiertos" className="flex items-center justify-center text-gray-600 rounded-lg w-9 h-9 btn-manage bg-gray-200/50 dark:bg-coal-300 dark:text-gray-300">
+                      <i className="text-xl ki-outline ki-entrance-left"></i>
+                    </button>
+                    <button title="Malla curricular" className="flex items-center justify-center text-gray-600 rounded-lg w-9 h-9 btn-manage bg-gray-200/50 dark:bg-coal-300 dark:text-gray-300">
+                      <i className="text-xl ki-outline ki-book-open"></i>
+                    </button>
+                    <button title="Configurar pagos" className="flex items-center justify-center text-gray-600 rounded-lg w-9 h-9 btn-manage bg-gray-200/50 dark:bg-coal-300 dark:text-gray-300">
+                      <i className="text-xl ki-outline ki-setting-2"></i>
+                    </button>
+                    <button title="Configurar documentos" className="flex items-center justify-center text-gray-600 rounded-lg w-9 h-9 btn-manage bg-gray-200/50 dark:bg-coal-300 dark:text-gray-300">
+                      <i className="text-xl ki-outline ki-files"></i>
+                    </button>
+                  </div>
+
+                  <div className="flex-grow space-y-3">
+                    <div className="flex flex-col"><span className="text-[8px] font-bold text-gray-400 uppercase">Código</span><span className="text-xs font-bold text-gray-700 dark:text-gray-200">{program.codigo}</span></div>
+                    <div className="flex flex-col"><span className="text-[8px] font-bold text-gray-400 uppercase">Nivel</span><span className="text-xs font-bold text-gray-700 dark:text-gray-200">{program.nivel}</span></div>
+                    <div className="flex flex-col"><span className="text-[8px] font-bold text-gray-400 uppercase">Metodología</span><span className="text-xs font-bold text-gray-700 dark:text-gray-200">{program.formacion}</span></div>
+                    <div className="flex flex-col"><span className="text-[8px] font-bold text-gray-400 uppercase">Estado</span><span className="text-xs font-bold uppercase text-success">{program.status}</span></div>
+                  </div>
+
+                  {/* Botones Inferiores */}
+                  <div className="flex justify-between gap-2 pt-4 border-t border-gray-200 dark:border-coal-300">
+                    <button title="Actualizar" className="flex-1 py-2 bg-[#f0f0f3] dark:bg-coal-400 rounded-lg text-gray-500 btn-manage shadow-sm">
+                      <i className="ki-outline ki-arrows-loop"></i>
+                    </button>
+                    <button title="Eliminar" className="flex-1 py-2 bg-[#f0f0f3] dark:bg-coal-400 rounded-lg text-danger btn-manage shadow-sm">
+                      <i className="ki-outline ki-trash"></i>
+                    </button>
+                    <button title="Información" className="flex-1 py-2 bg-[#f0f0f3] dark:bg-coal-400 rounded-lg text-[#6366f1] btn-manage shadow-sm">
+                      <i className="ki-outline ki-eye"></i>
+                    </button>
+                  </div>
+                </div>
+
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Indicadores (Dots) */}
-      <div className="flex justify-center gap-3 mt-4">
+      <div className="flex justify-center gap-2 mt-2 mb-4">
         {programs.map((_, idx) => (
-          <div 
-            key={idx} 
-            className={`h-1.5 rounded-full transition-all duration-300 ${
-              idx === activeIndex ? 'w-10 bg-[#6366f1]' : 'w-2 bg-gray-300'
-            }`} 
-          />
+          <div key={idx} className={`h-1.5 rounded-full transition-all duration-300 ${idx === activeIndex ? 'w-8 bg-[#6366f1]' : 'w-1.5 bg-gray-300 dark:bg-gray-600'}`} />
         ))}
       </div>
     </div>
