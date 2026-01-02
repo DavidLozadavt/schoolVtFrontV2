@@ -91,49 +91,68 @@ import { ConfigurarAsientosPage } from '@/pages/configurar-asientos';
 import { AhorroTerceroPage } from '@/pages/ahorro-tercero';
 import { CobrosPolizasPage } from '@/pages/cobros-polizas';
 import MultimediaPage from '@/pages/multimedia/gestion-multimedia/MultimediaPage';
+import ProfesoresPage from '@/pages/profesores/profes/ProfesoresPage';
 
 // Componentes temporales para pruebas
-const PeriodosPage = () => <div className="p-8"><h2>Gestión de Periodos - Próximamente</h2></div>;
-const JornadasPage = () => <div className="p-8"><h2>Gestión de Jornadas - Próximamente</h2></div>;
-const InfraestructuraPage = () => <div className="p-8"><h2>Gestión de Infraestructura - Próximamente</h2></div>;
+const PeriodosPage = () => (
+  <div className="p-8">
+    <h2>Gestión de Periodos - Próximamente</h2>
+  </div>
+);
+const JornadasPage = () => (
+  <div className="p-8">
+    <h2>Gestión de Jornadas - Próximamente</h2>
+  </div>
+);
+const InfraestructuraPage = () => (
+  <div className="p-8">
+    <h2>Gestión de Infraestructura - Próximamente</h2>
+  </div>
+);
 
 import DashboardCoordinador from '@/pages/cordinador/DashboardCordinador';
 import GestionProgramas from '@/pages/programas-academicos/GestionProgramas';
+import ProfesoresContent from '@/pages/profesores/profes/ProfesoresContent';
 
 // Configuración de prioridades de Dashboards
 // El orden importa: el primero que coincida será el que se muestre.
 const DASHBOARD_CONFIG = [
-  { 
-    permission: 'GESTION_RECTOR', 
-    component: <div className="p-8"><h2>Dashboard de Rectoría - Próximamente</h2></div> 
+  {
+    permission: 'GESTION_RECTOR',
+    component: (
+      <div className="p-8">
+        <h2>Dashboard de Rectoría - Próximamente</h2>
+      </div>
+    )
   },
-  { 
-    permission: 'GESTION_COORDINADOR', 
-    component: <DashboardCoordinador /> 
+  {
+    permission: 'GESTION_COORDINADOR',
+    component: <DashboardCoordinador />
   },
-  { 
-    permission: 'GESTION_PROFESOR', 
-    component: <div className="p-8"><h2>Dashboard de Docente - Próximamente</h2></div> 
+  {
+    permission: 'GESTION_PROFESOR',
+    component: <ProfesoresPage />
   },
-  { 
-    permission: 'GESTION_ESTUDIANTE', 
-    component: <div className="p-8"><h2>Dashboard de Estudiante - Próximamente</h2></div> 
+  {
+    permission: 'GESTION_ESTUDIANTE',
+    component: (
+      <div className="p-8">
+        <h2>Dashboard de Estudiante - Próximamente</h2>
+      </div>
+    )
   }
 ];
 const AppRoutingSetup = (): ReactElement => {
+  const { permissions } = useAuthContext();
 
-  const { permissions } = useAuthContext();  
-  
   // Función lógica para seleccionar el dashboard
   const getActiveDashboard = () => {
-    const active = DASHBOARD_CONFIG.find(item => 
-      permissions?.includes(item.permission)
-    );
+    const active = DASHBOARD_CONFIG.find((item) => permissions?.includes(item.permission));
 
     // Si hay coincidencia retornamos su componente, si no, el DefaultPage original
     return active ? active.component : <DefaultPage />;
   };
-  
+
   return (
     <Routes>
       <Route element={<RequireAuth />}>
@@ -760,7 +779,6 @@ const AppRoutingSetup = (): ReactElement => {
             }
           />
 
-
           {/* --- SECCIÓN GESTIÓN ACADÉMICA --- */}
           <Route
             path="/gestion-academica/configuracion/programas"
@@ -795,10 +813,6 @@ const AppRoutingSetup = (): ReactElement => {
               </ProtectedRoute>
             }
           />
-
-
-
-
 
           <Route
             path="/multimedia/gestion-multimedia"
@@ -843,10 +857,6 @@ const AppRoutingSetup = (): ReactElement => {
               </ProtectedRoute>
             }
           />
-
-
-
-
 
           <Route
             path="/gestion-productos/configuracion-producto"
@@ -895,6 +905,14 @@ const AppRoutingSetup = (): ReactElement => {
             element={
               <ProtectedRoute requiredPermissions={['GESTION_USUARIO']}>
                 <SolicitudAlmacenPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profesores"
+            element={
+              <ProtectedRoute requiredPermissions={['GESTION_USUARIO']}>
+                <ProfesoresPage />
               </ProtectedRoute>
             }
           />
