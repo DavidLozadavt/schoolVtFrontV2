@@ -27,20 +27,24 @@ const FormularioPrograma: React.FC<FormularioProgramaProps> = ({ isOpen, onClose
       return;
     }
 
-    // Creamos el objeto con la estructura que espera el componente padre
+    const studyImage = `https://plus.unsplash.com/premium_photo-1663040339031-29497e641777?q=80&w=500&auto=format&fit=crop&sig=${Date.now()}`;
+    
     const newEntry = {
-      id: Date.now(), // ID único temporal
+      id: Date.now(), 
       name: formData.name.toUpperCase(),
       status: formData.status.toUpperCase() || 'PENDIENTE',
-      imageUrl: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=500', // Imagen por defecto
+      imageUrl: `https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=500&auto=format&fit=crop&sig=${Math.random()}`, 
       codigo: formData.codigo.toUpperCase(),
       nivel: formData.nivel.toUpperCase(),
       formacion: formData.formacion.toUpperCase(),
     };
 
-    onAddProgram(newEntry); // Enviamos al padre
-    setFormData({ name: '', codigo: '', formacion: '', nivel: '', status: '', description: '' }); // Limpiamos
-    onClose(); // Cerramos
+ 
+    newEntry.imageUrl = `https://loremflickr.com/500/300/education,school?lock=${Math.floor(Math.random() * 1000)}`;
+
+    onAddProgram(newEntry); 
+    setFormData({ name: '', codigo: '', formacion: '', nivel: '', status: '', description: '' }); 
+    onClose(); 
   };
 
   return (
