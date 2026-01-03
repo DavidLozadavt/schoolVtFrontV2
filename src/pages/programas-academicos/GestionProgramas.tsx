@@ -23,7 +23,6 @@ const GestionProgramas: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
 
-  // Filtro de búsqueda interactivo
   const filteredPrograms = useMemo(() => {
     return programs.filter(p => 
       p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -31,131 +30,130 @@ const GestionProgramas: React.FC = () => {
     );
   }, [searchTerm, programs]);
 
-  const scrollAmount = 260; // Ajustado al nuevo tamaño (220px + gap)
-
   const scroll = (direction: 'left' | 'right') => {
     if (carouselRef.current) {
+      const cardWidth = 260; 
       const { scrollLeft } = carouselRef.current;
-      const target = direction === 'left' ? scrollLeft - scrollAmount : scrollLeft + scrollAmount;
+      const target = direction === 'left' ? scrollLeft - cardWidth : scrollLeft + cardWidth;
       carouselRef.current.scrollTo({ left: target, behavior: 'smooth' });
     }
   };
 
   const handleScroll = () => {
     if (carouselRef.current) {
-      const index = Math.round(carouselRef.current.scrollLeft / scrollAmount);
+      const cardWidth = 260;
+      const index = Math.round(carouselRef.current.scrollLeft / cardWidth);
       if (index !== activeIndex) setActiveIndex(index);
     }
   };
 
   return (
-    <div className="flex flex-col w-full h-screen max-h-screen p-4 lg:p-6 bg-[#f3f4f7] dark:bg-coal-500 font-sans overflow-hidden">
+    <div className="flex flex-col w-full h-screen min-h-screen p-4 md:p-8 bg-[#f3f4f7] dark:bg-coal-500 font-sans overflow-hidden">
       
       <style>{`
-        .container-3d { perspective: 1000px; }
-        .card-inner { 
-          position: relative; width: 100%; height: 100%; 
-          transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); 
-          transform-style: preserve-3d; 
-        }
-        .group:hover .card-inner { transform: rotateY(180deg); }
-        .face { 
-          position: absolute; width: 100%; height: 100%; 
-          backface-visibility: hidden; border-radius: 1.25rem; overflow: hidden;
-        }
-        .face-back { transform: rotateY(180deg); background: #f8f9fa; }
-        .dark .face-back { background: #1e1e20; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        
-        .btn-manage { transition: all 0.2s ease; border: 1px solid transparent; }
-        .btn-manage:hover { border-color: #6366f1; background: white; transform: scale(1.05); }
-        .dark .btn-manage:hover { box-shadow: 0 0 10px rgba(99, 102, 241, 0.4); background: #2a2a2d; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
 
-      {/* Header: Añadir + Buscador */}
-      <div className="flex flex-col justify-between gap-4 mb-6 md:flex-row md:items-center">
-        <button className="flex items-center gap-3 px-5 py-2.5 rounded-xl font-bold uppercase transition-all active:scale-95 bg-[#6366f1] text-white shadow-lg hover:bg-[#4f46e5] w-fit">
-          <i className="text-sm ki-filled ki-plus"></i>
-          <span className="text-[10px] tracking-widest">Añadir Programa</span>
+      {/* Header */}
+      <div className="flex items-center justify-between w-full max-w-6xl gap-2 mx-auto mb-8">
+        <button className="flex items-center gap-2 md:gap-3 px-4 md:px-6 py-2.5 rounded-xl font-bold uppercase transition-all active:scale-95 bg-blue-600 text-white shadow-lg hover:bg-blue-700 flex-shrink-0">
+          <i className="text-xs md:text-sm ki-filled ki-plus"></i>
+          <span className="text-[9px] md:text-[10px] tracking-widest whitespace-nowrap">Añadir Programa</span>
         </button>
 
-        {/* Barra de Búsqueda Interactiva */}
-        <div className="relative w-full md:w-80">
-          <i className="absolute text-gray-400 -translate-y-1/2 ki-outline ki-magnifier left-4 top-1/2"></i>
+        <div className="group flex items-center bg-white dark:bg-coal-300 border border-gray-200 dark:border-transparent rounded-full p-1 transition-all duration-500 ease-in-out w-[42px] hover:w-[200px] md:hover:w-[300px] focus-within:w-[200px] md:focus-within:w-[300px] shadow-sm flex-shrink-0 overflow-hidden">
+          <div className="flex items-center justify-center flex-shrink-0 w-8 h-8 text-gray-600 transition-colors group-hover:text-blue-500">
+            <i className="text-lg ki-outline ki-magnifier"></i>
+          </div>
           <input 
             type="text"
-            placeholder="Buscar programa o código..."
+            placeholder="Buscar..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-11 pr-4 py-2.5 rounded-2xl bg-white dark:bg-coal-300 border border-gray-200 dark:border-transparent focus:ring-2 focus:ring-[#6366f1] outline-none text-sm transition-all shadow-sm dark:text-white"
+            className="w-full px-2 text-sm transition-opacity duration-300 bg-transparent border-none outline-none opacity-0 group-hover:opacity-100 focus:opacity-100 dark:text-white"
           />
         </div>
       </div>
 
-      <div className="relative w-full max-w-[1000px] mx-auto flex-grow flex items-center">
-        {/* Navegación */}
-        <button onClick={() => scroll('left')} className="absolute left-[-10px] z-50 w-9 h-9 flex items-center justify-center bg-white dark:bg-coal-300 rounded-full shadow-md hover:scale-110"><i className="ki-outline ki-left"></i></button>
-        <button onClick={() => scroll('right')} className="absolute right-[-10px] z-50 w-9 h-9 flex items-center justify-center bg-white dark:bg-coal-300 rounded-full shadow-md hover:scale-110"><i className="ki-outline ki-right"></i></button>
+      <div className="relative w-full max-w-[1250px] mx-auto flex-grow flex items-center px-4 md:px-12 overflow-hidden">
+        
+        <button onClick={() => scroll('left')} className="absolute z-50 items-center justify-center hidden w-10 h-10 text-gray-600 transition-all bg-white border border-transparent rounded-full shadow-xl left-2 md:left-4 sm:flex dark:bg-coal-300 hover:scale-110 active:scale-95 dark:text-gray-300 dark:border-coal-200">
+          <i className="text-xl ki-outline ki-left"></i>
+        </button>
 
-        <div ref={carouselRef} onScroll={handleScroll} className="flex w-full gap-10 px-4 py-8 overflow-x-auto no-scrollbar snap-x snap-mandatory">
-          {filteredPrograms.length > 0 ? (
-            filteredPrograms.map((program, idx) => (
-              <div key={program.id} className={`container-3d flex-shrink-0 snap-center w-[220px] h-[320px] group transition-transform duration-500 ${idx === activeIndex ? 'scale-105' : 'scale-95'}`}>
-                <div className="shadow-xl card-inner">
+        <div 
+          ref={carouselRef} 
+          onScroll={handleScroll} 
+          className="flex items-center w-full gap-10 py-10 overflow-x-auto no-scrollbar snap-x snap-mandatory scroll-smooth"
+        >
+          {filteredPrograms.map((program) => (
+            <div 
+              key={program.id} 
+              className="flex-shrink-0 snap-center w-[220px] h-[320px] group [perspective:1000px] transition-all duration-500 scale-100"
+            >
+              <div className="relative w-full h-full transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] shadow-2xl rounded-[1.25rem]">
+                
+                {/* FRENTE */}
+                <div className="absolute inset-0 [backface-visibility:hidden] rounded-[1.25rem] overflow-hidden border border-gray-200/50 dark:border-transparent">
+                  <img src={program.imageUrl} alt={program.name} className="absolute inset-0 object-cover w-full h-full" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-transparent to-transparent" />
+                  <div className="absolute inset-0 flex flex-col justify-end p-5 text-white">
+                    <span className="w-fit px-2 py-0.5 mb-1.5 font-bold uppercase rounded-md text-[8px] bg-blue-600">Programa</span>
+                    <h3 className="text-sm font-black leading-tight tracking-wide uppercase">{program.name}</h3>
+                    <p className="font-bold text-white/80 text-[8px] uppercase">{program.status}</p>
+                  </div>
+                </div>
+
+                {/* REVERSO */}
+                <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)] bg-[#f8f9fa] dark:bg-coal-400 rounded-[1.25rem] p-5 flex flex-col border border-white dark:border-coal-300 shadow-inner">
                   
-                  {/* FRENTE (Más pequeña) */}
-                  <div className="relative border face face-front border-gray-200/50 dark:border-transparent">
-                    <img src={program.imageUrl} alt={program.name} className="absolute inset-0 object-cover w-full h-full" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
-                    <div className="absolute inset-0 flex flex-col justify-end p-5">
-                      <span className="w-fit px-2 py-0.5 mb-1.5 font-bold text-white uppercase rounded-md text-[8px] bg-[#6366f1]">Programa</span>
-                      <h3 className="text-sm font-black leading-tight tracking-wide text-white uppercase">{program.name}</h3>
-                      <p className="font-bold text-white/50 text-[8px] uppercase">{program.status}</p>
-                    </div>
+                  {/* Botones Superiores - Cambiados a Azul */}
+                  <div className="flex justify-between mb-4">
+                    {['entrance-left', 'book-open', 'setting-2', 'files'].map((icon) => (
+                      <button key={icon} className="flex items-center justify-center w-8 h-8 text-gray-600 transition-all border border-transparent rounded-lg dark:text-blue-300 bg-blue-100/30 dark:bg-blue-500/10 hover:border-blue-500 hover:scale-105 active:scale-95">
+                        <i className={`text-lg ki-outline ki-${icon}`}></i>
+                      </button>
+                    ))}
                   </div>
 
-                  {/* REVERSO (Más pequeña) */}
-                  <div className="flex flex-col p-5 border border-white shadow-inner face face-back dark:border-coal-300">
-                    <div className="flex justify-between mb-4">
-                      <button title="Periodos" className="flex items-center justify-center w-8 h-8 text-gray-500 rounded-lg btn-manage bg-gray-200/40 dark:bg-coal-400">
-                        <i className="text-lg ki-outline ki-entrance-left"></i>
-                      </button>
-                      <button title="Malla" className="flex items-center justify-center w-8 h-8 text-gray-500 rounded-lg btn-manage bg-gray-200/40 dark:bg-coal-400">
-                        <i className="text-lg ki-outline ki-book-open"></i>
-                      </button>
-                      <button title="Pagos" className="flex items-center justify-center w-8 h-8 text-gray-500 rounded-lg btn-manage bg-gray-200/40 dark:bg-coal-400">
-                        <i className="text-lg ki-outline ki-setting-2"></i>
-                      </button>
-                      <button title="Documentos" className="flex items-center justify-center w-8 h-8 text-gray-500 rounded-lg btn-manage bg-gray-200/40 dark:bg-coal-400">
-                        <i className="text-lg ki-outline ki-files"></i>
-                      </button>
-                    </div>
+                  <div className="flex-grow space-y-2.5">
+                    <div className="flex flex-col"><span className="text-[7px] font-bold text-gray-400 dark:text-gray-300 uppercase">Cod.</span><span className="text-[11px] font-bold text-gray-700 dark:text-white">{program.codigo}</span></div>
+                    <div className="flex flex-col"><span className="text-[7px] font-bold text-gray-400 dark:text-gray-300 uppercase">Nivel</span><span className="text-[11px] font-bold text-gray-700 dark:text-white">{program.nivel}</span></div>
+                    <div className="flex flex-col"><span className="text-[7px] font-bold text-gray-400 dark:text-gray-300 uppercase">Estado</span><span className="text-[11px] font-bold text-emerald-500 dark:text-emerald-400 uppercase">{program.status}</span></div>
+                  </div>
 
-                    <div className="flex-grow space-y-2.5">
-                      <div className="flex flex-col"><span className="text-[7px] font-bold text-gray-400 uppercase">Cod.</span><span className="text-[11px] font-bold text-gray-700 dark:text-gray-200">{program.codigo}</span></div>
-                      <div className="flex flex-col"><span className="text-[7px] font-bold text-gray-400 uppercase">Nivel</span><span className="text-[11px] font-bold text-gray-700 dark:text-gray-200">{program.nivel}</span></div>
-                      <div className="flex flex-col"><span className="text-[7px] font-bold text-gray-400 uppercase">Estado</span><span className="text-[11px] font-bold text-success uppercase">{program.status}</span></div>
-                    </div>
-
-                    <div className="flex justify-between gap-2 pt-3 border-t border-gray-100 dark:border-coal-300">
-                      <button title="Actualizar" className="flex-1 py-1.5 bg-gray-100 dark:bg-coal-400 rounded-lg text-gray-400 btn-manage"><i className="ki-outline ki-arrows-loop"></i></button>
-                      <button title="Eliminar" className="flex-1 py-1.5 bg-gray-100 dark:bg-coal-400 rounded-lg text-danger/70 btn-manage"><i className="ki-outline ki-trash"></i></button>
-                      <button title="Ver" className="flex-1 py-1.5 bg-gray-100 dark:bg-coal-400 rounded-lg text-[#6366f1] btn-manage"><i className="ki-outline ki-eye"></i></button>
-                    </div>
+                  {/* Botones Inferiores - Todos en tonos Azules/Rojo */}
+                  <div className="flex justify-between gap-2 pt-3 mt-auto border-t border-gray-100 dark:border-coal-200">
+                    <button title="Actualizar" className="flex-1 py-1.5 flex items-center justify-center bg-blue-50/50 dark:bg-blue-500/10 rounded-lg text-blue-500 dark:text-blue-400 border border-transparent hover:border-blue-500 transition-all">
+                      <i className="ki-outline ki-arrows-loop"></i>
+                    </button>
+                    <button title="Eliminar" className="flex-1 py-1.5 flex items-center justify-center bg-red-50/50 dark:bg-red-500/10 rounded-lg text-red-500 dark:text-red-400 border border-transparent hover:border-red-500 transition-all">
+                      <i className="ki-outline ki-trash"></i>
+                    </button>
+                    <button title="Ver" className="flex-1 py-1.5 flex items-center justify-center bg-blue-50/50 dark:bg-blue-500/10 rounded-lg text-blue-600 dark:text-blue-300 border border-transparent hover:border-blue-600 transition-all">
+                      <i className="ki-outline ki-eye"></i>
+                    </button>
                   </div>
                 </div>
               </div>
-            ))
-          ) : (
-            <div className="w-full py-10 italic text-center text-gray-400">No se encontraron programas...</div>
-          )}
+            </div>
+          ))}
         </div>
+
+        <button onClick={() => scroll('right')} className="absolute z-50 items-center justify-center hidden w-10 h-10 text-gray-600 transition-all bg-white border border-transparent rounded-full shadow-xl right-2 md:right-4 sm:flex dark:bg-coal-300 hover:scale-110 active:scale-95 dark:text-gray-300 dark:border-coal-200">
+          <i className="text-xl ki-outline ki-right"></i>
+        </button>
       </div>
 
-      {/* Indicadores */}
-      <div className="flex justify-center gap-1.5 mt-2">
+      {/* Indicadores - Cambiados a Azul */}
+      <div className="flex justify-center gap-2 pb-6 mt-4">
         {filteredPrograms.map((_, idx) => (
-          <div key={idx} className={`h-1 rounded-full transition-all duration-300 ${idx === activeIndex ? 'w-6 bg-[#6366f1]' : 'w-1 bg-gray-300 dark:bg-gray-600'}`} />
+          <button 
+            key={idx} 
+            onClick={() => carouselRef.current?.scrollTo({ left: idx * 260, behavior: 'smooth' })}
+            className={`h-1.5 rounded-full transition-all duration-300 ${idx === activeIndex ? 'w-10 bg-blue-600' : 'w-2 bg-gray-300 dark:bg-gray-600'}`} 
+          />
         ))}
       </div>
     </div>
