@@ -1,5 +1,6 @@
 import React, { useState, useRef, useMemo } from 'react';
 import FormularioPrograma from './FormularioPrograma';
+import Toast from './Toast';
 
 interface Program {
   id: number;
@@ -13,13 +14,27 @@ interface Program {
 
 const GestionProgramas: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [programs] = useState<Program[]>([
+  const [showToast, setShowToast] = useState(false);
+  const [programs, setPrograms] = useState<Program[]>([
     { id: 1, name: 'TRANSICIÓN', status: 'APROBADO', imageUrl: 'https://images.unsplash.com/photo-1510915228340-29c85a43dcfe?q=80&w=500', codigo: 'TRANS01', nivel: 'PREESCOLAR', formacion: 'PRESENCIAL' },
     { id: 2, name: 'JARDÍN', status: 'APROBADO', imageUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=500', codigo: 'JARDIN1234', nivel: 'PREESCOLAR', formacion: 'PRESENCIAL' },
     { id: 3, name: 'MATERNO', status: 'APROBADO', imageUrl: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=500', codigo: 'MATER02', nivel: 'PREESCOLAR', formacion: 'PRESENCIAL' },
-    { id: 4, name: 'PREJARDÍN', status: 'APROBADO', imageUrl: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=500', codigo: 'PREJAR03', nivel: 'PREESCOLAR', formacion: 'PRESENCIAL' },
-    { id: 5, name: 'PRIMARIA', status: 'APROBADO', imageUrl: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?q=80&w=500', codigo: 'PRIM04', nivel: 'BÁSICA', formacion: 'PRESENCIAL' },
+   
   ]);
+
+  const handleAddProgram = (newProgram: Program) => {
+    setPrograms((prev) => [...prev, newProgram]);
+    setShowToast(true);
+    
+    setTimeout(() => {
+      if (carouselRef.current) {
+        carouselRef.current.scrollTo({ 
+          left: carouselRef.current.scrollWidth, 
+          behavior: 'smooth' 
+        });
+      }
+    }, 100);
+  };
 
   const [searchTerm, setSearchTerm] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
@@ -56,14 +71,12 @@ const GestionProgramas: React.FC = () => {
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
 
-      {/* Título Principal */}
       <div className="w-full max-w-6xl mx-auto mb-6 text-center">
         <h1 className="text-3xl font-semibold tracking-tight text-gray-800 dark:text-white">
           Programas
         </h1>
       </div>
 
-      {/* Toolbar */}
       <div className="flex items-center justify-between w-full max-w-5xl gap-4 px-2 mx-auto mb-8">
         <div className="group flex items-center bg-white dark:bg-coal-300 border border-gray-200 dark:border-transparent rounded-full p-1.5 transition-all duration-500 ease-in-out w-[46px] hover:w-[280px] md:hover:w-[350px] focus-within:w-[280px] md:focus-within:w-[350px] shadow-sm overflow-hidden">
           <div className="flex items-center justify-center flex-shrink-0 w-8 h-8 text-gray-500 transition-colors group-hover:text-blue-600 group-focus-within:text-blue-600">
@@ -91,7 +104,6 @@ const GestionProgramas: React.FC = () => {
         </button>
       </div>
 
-      {/* Carrusel */}
       <div className="relative w-full max-w-[1200px] mx-auto flex-grow flex items-center px-4 md:px-10 overflow-hidden">
         <button onClick={() => scroll('left')} className="absolute z-50 items-center justify-center hidden w-10 h-10 text-gray-600 transition-all bg-white border border-transparent rounded-full shadow-xl left-2 md:left-4 sm:flex dark:bg-coal-300 hover:scale-110 active:scale-95 dark:text-gray-300">
           <i className="text-xl ki-outline ki-left"></i>
@@ -106,7 +118,6 @@ const GestionProgramas: React.FC = () => {
             <div key={program.id} className="flex-shrink-0 snap-center w-[220px] h-[310px] group [perspective:1000px] transition-all duration-500">
               <div className="relative w-full h-full transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] shadow-xl rounded-[1.25rem]">
                 
-                {/* FRENTE */}
                 <div className="absolute inset-0 [backface-visibility:hidden] rounded-[1.25rem] overflow-hidden border border-gray-200/50 dark:border-transparent">
                   <img src={program.imageUrl} alt={program.name} className="absolute inset-0 object-cover w-full h-full" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-transparent to-transparent" />
@@ -119,19 +130,18 @@ const GestionProgramas: React.FC = () => {
                   </div>
                 </div>
 
-                {/* REVERSO */}
                 <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)] bg-[#f8f9fa] dark:bg-coal-400 rounded-[1.25rem] p-5 flex flex-col border border-white dark:border-coal-300 shadow-inner">
                   <div className="flex justify-between mb-4">
-                    <button className="flex items-center justify-center w-8 h-8 text-gray-600 transition-all border border-transparent rounded-lg dark:text-blue-300 bg-blue-100/30 dark:bg-blue-500/10 hover:border-blue-500 hover:scale-105 active:scale-95">
+                    <button title="Periodos abiertos" className="flex items-center justify-center w-8 h-8 text-gray-600 transition-all border border-transparent rounded-lg dark:text-blue-300 bg-blue-100/30 dark:bg-blue-500/10 hover:border-blue-500 hover:scale-105 active:scale-95">
                       <i className="text-lg ki-outline ki-entrance-right"></i>
                     </button>
-                    <button className="flex items-center justify-center w-8 h-8 text-gray-600 transition-all border border-transparent rounded-lg dark:text-blue-300 bg-blue-100/30 dark:bg-blue-500/10 hover:border-blue-500 hover:scale-105 active:scale-95">
+                    <button title="Malla curricular" className="flex items-center justify-center w-8 h-8 text-gray-600 transition-all border border-transparent rounded-lg dark:text-blue-300 bg-blue-100/30 dark:bg-blue-500/10 hover:border-blue-500 hover:scale-105 active:scale-95">
                       <i className="text-lg ki-outline ki-book-open"></i>
                     </button>
-                    <button className="flex items-center justify-center w-8 h-8 text-gray-600 transition-all border border-transparent rounded-lg dark:text-blue-300 bg-blue-100/30 dark:bg-blue-500/10 hover:border-blue-500 hover:scale-105 active:scale-95">
+                    <button title="Configurar pagos" className="flex items-center justify-center w-8 h-8 text-gray-600 transition-all border border-transparent rounded-lg dark:text-blue-300 bg-blue-100/30 dark:bg-blue-500/10 hover:border-blue-500 hover:scale-105 active:scale-95">
                       <i className="text-lg ki-outline ki-setting-2"></i>
                     </button>
-                    <button className="flex items-center justify-center w-8 h-8 text-gray-600 transition-all border border-transparent rounded-lg dark:text-blue-300 bg-blue-100/30 dark:bg-blue-500/10 hover:border-blue-500 hover:scale-105 active:scale-95">
+                    <button title="Configurar documentos" className="flex items-center justify-center w-8 h-8 text-gray-600 transition-all border border-transparent rounded-lg dark:text-blue-300 bg-blue-100/30 dark:bg-blue-500/10 hover:border-blue-500 hover:scale-105 active:scale-95">
                       <i className="text-lg ki-outline ki-files"></i>
                     </button>
                   </div>
@@ -152,9 +162,9 @@ const GestionProgramas: React.FC = () => {
                   </div>
 
                   <div className="flex justify-between gap-2 pt-3 mt-auto border-t border-gray-100 dark:border-coal-200">
-                    <button className="flex items-center justify-center flex-1 py-1.5 text-blue-500 transition-all border border-transparent bg-blue-50/50 dark:bg-blue-500/10 rounded-lg hover:border-blue-500"><i className="ki-outline ki-arrows-loop"></i></button>
-                    <button className="flex items-center justify-center flex-1 py-1.5 text-red-500 transition-all border border-transparent bg-red-50/50 dark:bg-red-500/10 rounded-lg hover:border-red-500"><i className="ki-outline ki-trash"></i></button>
-                    <button className="flex items-center justify-center flex-1 py-1.5 text-blue-600 transition-all border border-transparent bg-blue-50/50 dark:bg-blue-500/10 rounded-lg hover:border-blue-600"><i className="ki-outline ki-eye"></i></button>
+                    <button title="Actualizar" className="flex items-center justify-center flex-1 py-1.5 text-blue-500 transition-all border border-transparent bg-blue-50/50 dark:bg-blue-500/10 rounded-lg hover:border-blue-500"><i className="ki-outline ki-arrows-loop"></i></button>
+                    <button title="Eliminar" className="flex items-center justify-center flex-1 py-1.5 text-red-500 transition-all border border-transparent bg-red-50/50 dark:bg-red-500/10 rounded-lg hover:border-red-500"><i className="ki-outline ki-trash"></i></button>
+                    <button title="Información" className="flex items-center justify-center flex-1 py-1.5 text-blue-600 transition-all border border-transparent bg-blue-50/50 dark:bg-blue-500/10 rounded-lg hover:border-blue-600"><i className="ki-outline ki-eye"></i></button>
                   </div>
                 </div>
               </div>
@@ -167,7 +177,6 @@ const GestionProgramas: React.FC = () => {
         </button>
       </div>
 
-      {/* Indicadores */}
       <div className="flex justify-center gap-2 pb-6 mt-4">
         {filteredPrograms.map((_, idx) => (
           <button
@@ -178,10 +187,16 @@ const GestionProgramas: React.FC = () => {
         ))}
       </div>
 
-      {/* COMPONENTE FORMULARIO MODAL */}
       <FormularioPrograma 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
+        onAddProgram={handleAddProgram}
+      />
+
+      <Toast 
+        message="El programa ha sido creado correctamente." 
+        isOpen={showToast} 
+        onClose={() => setShowToast(false)} 
       />
     </div>
   );
