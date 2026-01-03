@@ -22,20 +22,8 @@ const GestionProgramas: React.FC = () => {
   ]);
 
   const handleAddProgram = (newProgram: Program) => {
-    // AJUSTE: Forzamos que la imagen sea de estudio antes de agregarla
-    const studyImages = [
-      'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=500',
-      'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=500',
-      'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?q=80&w=500',
-      'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=500'
-    ];
-    
-    const enhancedProgram = {
-      ...newProgram,
-      imageUrl: studyImages[Math.floor(Math.random() * studyImages.length)] + `?sig=${Date.now()}`
-    };
-
-    setPrograms((prev) => [...prev, enhancedProgram]);
+   
+    setPrograms((prev) => [...prev, newProgram]);
     setShowToast(true);
     
     setTimeout(() => {
