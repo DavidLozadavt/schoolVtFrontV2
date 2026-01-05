@@ -92,13 +92,10 @@ import { AhorroTerceroPage } from '@/pages/ahorro-tercero';
 import { CobrosPolizasPage } from '@/pages/cobros-polizas';
 import MultimediaPage from '@/pages/multimedia/gestion-multimedia/MultimediaPage';
 import ProfesoresPage from '@/pages/profesores/profes/ProfesoresPage';
+import PeriodosPage from '@/pages/periodos/PeriodosPage';
 
 // Componentes temporales para pruebas
-const PeriodosPage = () => (
-  <div className="p-8">
-    <h2>Gestión de Periodos - Próximamente</h2>
-  </div>
-);
+
 const JornadasPage = () => (
   <div className="p-8">
     <h2>Gestión de Jornadas - Próximamente</h2>
@@ -783,7 +780,7 @@ const AppRoutingSetup = (): ReactElement => {
           <Route
             path="/gestion-academica/configuracion/programas"
             element={
-              <ProtectedRoute requiredPermissions={['GESTION_COORDINADOR']}>
+              <ProtectedRoute requiredPermissions={['GESTION_USUARIO']}>
                 <GestionProgramas />
               </ProtectedRoute>
             }
@@ -792,7 +789,7 @@ const AppRoutingSetup = (): ReactElement => {
           <Route
             path="/gestion-academica/configuracion/periodos"
             element={
-              <ProtectedRoute requiredPermissions={['GESTION_COORDINADOR']}>
+              <ProtectedRoute requiredPermissions={['GESTION_USUARIO']}>
                 <PeriodosPage />
               </ProtectedRoute>
             }
@@ -800,7 +797,7 @@ const AppRoutingSetup = (): ReactElement => {
           <Route
             path="/gestion-academica/configuracion/infraestructura"
             element={
-              <ProtectedRoute requiredPermissions={['GESTION_COORDINADOR']}>
+              <ProtectedRoute requiredPermissions={['GESTION_USUARIO']}>
                 <InfraestructuraPage />
               </ProtectedRoute>
             }
@@ -808,7 +805,7 @@ const AppRoutingSetup = (): ReactElement => {
           <Route
             path="/gestion-academica/configuracion/jornadas"
             element={
-              <ProtectedRoute requiredPermissions={['GESTION_CORDINADOR']}>
+              <ProtectedRoute requiredPermissions={['GESTION_USUARIO']}>
                 <JornadasPage />
               </ProtectedRoute>
             }
@@ -911,7 +908,7 @@ const AppRoutingSetup = (): ReactElement => {
           <Route
             path="/profesores"
             element={
-              <ProtectedRoute requiredPermissions={['GESTION_USUARIO']}>
+              <ProtectedRoute requiredPermissions={['GESTION_PROFESOR']}>
                 <ProfesoresPage />
               </ProtectedRoute>
             }

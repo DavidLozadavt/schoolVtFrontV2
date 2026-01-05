@@ -1,32 +1,31 @@
 import { type TMenuConfig } from '@/components/menu';
 
 export const MENU_SIDEBAR: TMenuConfig = [
-   {
+  {
     title: 'Gestión Académica',
     icon: 'teacher',
-    requiredPermissions: ['GESTION_COORDINADOR'], 
+    requiredPermissions: ['GESTION_USUARIO'],
     children: [
       {
         title: 'Gestión Programas',
         path: '/gestion-academica/configuracion/programas',
-        requiredPermissions: ['GESTION_COORDINADOR']
+        requiredPermissions: ['GESTION_USUARIO']
       },
       {
         title: 'Periodos',
         path: '/gestion-academica/configuracion/periodos',
-        requiredPermissions: ['GESTION_COORDINADOR']
+        requiredPermissions: ['GESTION_USUARIO']
       },
       {
         title: 'Jornadas',
         path: '/gestion-academica/configuracion/jornadas',
-        requiredPermissions: ['GESTION_COORDINADOR']
+        requiredPermissions: ['GESTION_USUARIO']
       },
       {
         title: 'Infraestructura',
         path: '/gestion-academica/configuracion/infraestructura',
-        requiredPermissions: ['GESTION_COORDINADOR']
-      },
-    
+        requiredPermissions: ['GESTION_USUARIO']
+      }
     ]
   },
 
@@ -355,9 +354,6 @@ export const MENU_SIDEBAR: TMenuConfig = [
       }
     ]
   },
-
-
- 
 
   {
     title: 'Gestión de sedes',
