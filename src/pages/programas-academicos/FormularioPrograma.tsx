@@ -47,24 +47,39 @@ const FormularioPrograma: React.FC<FormularioProgramaProps> = ({ isOpen, onClose
 
   if (!isOpen) return null;
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!formData.name || !formData.codigo || !formData.nivel || !formData.formacion || !formData.status) {
       alert("Por favor completa todos los campos requeridos");
       return;
     }
 
-    const newEntry = {
-      name: formData.name.toUpperCase(),
-      codigo: formData.codigo.toUpperCase(),
-      nivelEducativo_id: formData.nivel,
-      tipoFormacion_id: formData.formacion,
-      estadoPrograma_id: formData.status,
-      description: formData.description
+    const payload = {
+      nombrePrograma: formData.name.toUpperCase(),
+      codigoPrograma: formData.codigo.toUpperCase(),
+      idNivelEducativo: formData.nivel,
+      idTipoFormacion: formData.formacion,
+      idEstadoPrograma: formData.status,
+      descripcionPrograma: formData.description
     };
 
-    onAddProgram(newEntry); 
-    setFormData({ name: '', codigo: '', formacion: '', nivel: '', status: '', description: '' }); 
-    onClose(); 
+   try {
+      // 3. Envío al Backend
+      const response = await axios.post('/programas/guardar', payload); 
+      
+      if (response.data.status === 'success') {
+        alert("¡Programa creado satisfactoriamente!");
+        
+        // 4. Actualizar la tabla en el componente padre con los datos que devolvió Laravel
+        onAddProgram(response.data.data);
+        
+        // 5. Limpiar formulario y cerrar
+        setFormData({ name: '', codigo: '', formacion: '', nivel: '', status: '', description: '' });
+        onClose();
+      }
+    } catch (error: any) {
+      console.error("Error al guardar:", error.response?.data || error.message);
+      alert("Error al procesar la solicitud: " + (error.response?.data?.message || "Servidor no disponible"));
+    }
   };
 
   return (

@@ -1,4 +1,5 @@
-import React, { useState, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
+import axios from 'axios';
 import FormularioPrograma from './FormularioPrograma';
 import Toast from './Toast';
 
@@ -15,22 +16,54 @@ interface Program {
 const GestionProgramas: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
-  const [programs, setPrograms] = useState<Program[]>([
-    { id: 1, name: 'TRANSICIÓN', status: 'APROBADO', imageUrl: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=500', codigo: 'TRANS01', nivel: 'PREESCOLAR', formacion: 'PRESENCIAL' },
-    { id: 2, name: 'JARDÍN', status: 'APROBADO', imageUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=500', codigo: 'JARDIN1234', nivel: 'PREESCOLAR', formacion: 'PRESENCIAL' },
-    { id: 3, name: 'MATERNO', status: 'APROBADO', imageUrl: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=500', codigo: 'MATER02', nivel: 'PREESCOLAR', formacion: 'PRESENCIAL' },
-  ]);
+  const [programs, setPrograms] = useState<Program[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchProgramas();
+  }, []);
+
+  const fetchProgramas = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get('/programas');
+
+
+      if (response.data.status === 'success') {
+        const mappedData: Program[] = response.data.data.map((p: any) => ({
+          id: p.id,
+          name: p.nombrePrograma,
+          codigo: p.codigoPrograma,
+          status: p.estado?.nombre || 'ACTIVO',
+          nivel: p.nivel?.nombreNivel || 'N/A',
+          
+          formacion: p.tipo_formacion?.nombreTipoFormacion || 'N/A',
+          
+          imageUrl:
+            p.imageUrl ||
+            'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=500',
+        }));
+
+        setPrograms(mappedData);
+      }
+    } catch (error) {
+      console.error('Error al cargar programas:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   const handleAddProgram = (newProgram: Program) => {
-   
+
     setPrograms((prev) => [...prev, newProgram]);
     setShowToast(true);
-    
+
     setTimeout(() => {
       if (carouselRef.current) {
-        carouselRef.current.scrollTo({ 
-          left: carouselRef.current.scrollWidth, 
-          behavior: 'smooth' 
+        carouselRef.current.scrollTo({
+          left: carouselRef.current.scrollWidth,
+          behavior: 'smooth'
         });
       }
     }, 100);
@@ -66,13 +99,10 @@ const GestionProgramas: React.FC = () => {
 
   return (
     <div className="relative flex flex-col w-full h-screen min-h-screen p-4 md:p-8 bg-[#f3f4f7] dark:bg-coal-500 font-sans overflow-hidden">
-      
-      {/* CAPA DE FONDO DECORATIVA (Sutil y Profesional) */}
+
       <div className="absolute inset-0 z-0 pointer-events-none opacity-40 dark:opacity-20">
-        {/* Patrón de cuadrícula de puntos */}
         <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(#a1a1aa 0.5px, transparent 0.5px)', backgroundSize: '30px 30px' }}></div>
-        
-        {/* Luces de ambiente en las esquinas */}
+
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-500/10 blur-[120px] rounded-full -mr-64 -mt-64"></div>
         <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-indigo-500/10 blur-[120px] rounded-full -ml-64 -mb-64"></div>
       </div>
@@ -84,7 +114,7 @@ const GestionProgramas: React.FC = () => {
 
       {/* CONTENIDO PRINCIPAL (Encima del fondo) */}
       <div className="relative z-10 flex flex-col w-full h-full">
-        
+
         {/* Título Principal */}
         <div className="w-full max-w-6xl mx-auto mb-6 text-center">
           <h1 className="text-3xl font-semibold tracking-tight text-gray-800 uppercase dark:text-white">
@@ -108,7 +138,7 @@ const GestionProgramas: React.FC = () => {
             />
           </div>
 
-          <button 
+          <button
             onClick={() => setIsModalOpen(true)}
             className="group relative flex items-center justify-start h-[46px] w-[46px] hover:w-[180px] bg-blue-600 text-white rounded-full transition-all duration-500 ease-in-out overflow-hidden shadow-lg active:scale-95 flex-shrink-0"
           >
@@ -135,7 +165,7 @@ const GestionProgramas: React.FC = () => {
             {filteredPrograms.map((program) => (
               <div key={program.id} className="flex-shrink-0 snap-center w-[220px] h-[310px] group [perspective:1000px] transition-all duration-500">
                 <div className="relative w-full h-full transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] shadow-xl rounded-[1.25rem]">
-                  
+
                   {/* FRENTE */}
                   <div className="absolute inset-0 [backface-visibility:hidden] rounded-[1.25rem] overflow-hidden border border-gray-200/50 dark:border-transparent">
                     <img src={program.imageUrl} alt={program.name} className="absolute inset-0 object-cover w-full h-full" />
@@ -176,6 +206,14 @@ const GestionProgramas: React.FC = () => {
                         <span className="text-[11px] font-bold text-gray-700 dark:text-white leading-none">{program.nivel}</span>
                       </div>
                       <div className="flex flex-col">
+                        <span className="text-[10px] font-bold text-gray-400 dark:text-gray-300 uppercase tracking-tighter">
+                          Formación
+                        </span>
+                        <span className="text-[11px] font-bold text-gray-700 dark:text-white leading-none">
+                          {program.formacion}
+                        </span>
+                      </div>
+                      <div className="flex flex-col">
                         <span className="text-[10px] font-bold text-gray-400 dark:text-gray-300 uppercase tracking-tighter">Estado</span>
                         <span className="text-[11px] font-bold text-emerald-500 dark:text-emerald-400 uppercase tracking-wide">{program.status}</span>
                       </div>
@@ -209,16 +247,16 @@ const GestionProgramas: React.FC = () => {
         </div>
       </div>
 
-      <FormularioPrograma 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
+      <FormularioPrograma
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
         onAddProgram={handleAddProgram}
       />
 
-      <Toast 
-        message="El programa ha sido creado correctamente." 
-        isOpen={showToast} 
-        onClose={() => setShowToast(false)} 
+      <Toast
+        message="El programa ha sido creado correctamente."
+        isOpen={showToast}
+        onClose={() => setShowToast(false)}
       />
     </div>
   );
