@@ -1,10 +1,10 @@
 import { type TMenuConfig } from '@/components/menu';
 
 export const MENU_SIDEBAR: TMenuConfig = [
-   {
+  {
     title: 'Gestión Académica',
     icon: 'teacher',
-    requiredPermissions: ['GESTION_USUARIO'], 
+    requiredPermissions: ['GESTION_USUARIO'],
     children: [
       {
         title: 'Gestión Programas',
@@ -25,8 +25,7 @@ export const MENU_SIDEBAR: TMenuConfig = [
         title: 'Infraestructura',
         path: '/gestion-academica/configuracion/infraestructura',
         requiredPermissions: ['GESTION_USUARIO']
-      },
-    
+      }
     ]
   },
 
@@ -355,9 +354,6 @@ export const MENU_SIDEBAR: TMenuConfig = [
       }
     ]
   },
-
-
- 
 
   {
     title: 'Gestión de sedes',

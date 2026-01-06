@@ -92,13 +92,10 @@ import { AhorroTerceroPage } from '@/pages/ahorro-tercero';
 import { CobrosPolizasPage } from '@/pages/cobros-polizas';
 import MultimediaPage from '@/pages/multimedia/gestion-multimedia/MultimediaPage';
 import ProfesoresPage from '@/pages/profesores/profes/ProfesoresPage';
+import PeriodosPage from '@/pages/periodos/PeriodosPage';
 
 // Componentes temporales para pruebas
-const PeriodosPage = () => (
-  <div className="p-8">
-    <h2>Gestión de Periodos - Próximamente</h2>
-  </div>
-);
+
 const JornadasPage = () => (
   <div className="p-8">
     <h2>Gestión de Jornadas - Próximamente</h2>
@@ -785,7 +782,7 @@ const AppRoutingSetup = (): ReactElement => {
             path="/gestion-academica/configuracion/programas"
             element={
               <ProtectedRoute requiredPermissions={['GESTION_USUARIO']}>
-                <GestionProgramas/>
+                <GestionProgramas />
               </ProtectedRoute>
             }
           />
@@ -912,7 +909,7 @@ const AppRoutingSetup = (): ReactElement => {
           <Route
             path="/profesores"
             element={
-              <ProtectedRoute requiredPermissions={['GESTION_USUARIO']}>
+              <ProtectedRoute requiredPermissions={['GESTION_PROFESOR']}>
                 <ProfesoresPage />
               </ProtectedRoute>
             }
