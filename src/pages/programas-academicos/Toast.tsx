@@ -1,12 +1,7 @@
 import React, { useEffect } from 'react';
+import { ToastProps } from './types'; 
 
-interface ToastProps {
-  message: string;
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-const Toast: React.FC<ToastProps> = ({ message, isOpen, onClose }) => {
+export const Toast = ({ message, isOpen, onClose }: ToastProps) => {
   useEffect(() => {
     if (isOpen) {
       const timer = setTimeout(onClose, 3000);
@@ -30,7 +25,7 @@ const Toast: React.FC<ToastProps> = ({ message, isOpen, onClose }) => {
             {message}
           </span>
         </div>
-        <button onClick={onClose} className="ml-4 text-gray-400 hover:text-gray-600">
+        <button onClick={onClose} className="ml-4 text-gray-400 transition-colors hover:text-gray-600">
           <i className="text-sm ki-outline ki-cross"></i>
         </button>
       </div>

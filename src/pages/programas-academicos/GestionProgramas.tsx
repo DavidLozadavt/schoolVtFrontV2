@@ -2,22 +2,32 @@ import React, { useState, useRef, useMemo, useEffect } from 'react';
 import axios from 'axios';
 import FormularioPrograma from './FormularioPrograma';
 import Toast from './Toast';
+import { Program, GestionProgramasProps } from './types';
 
-interface Program {
-  id: number;
-  name: string;
-  status: string;
-  imageUrl: string;
-  codigo: string;
-  nivel: string;
-  formacion: string;
-}
 
-const GestionProgramas: React.FC = () => {
+
+const IMAGENES_POR_NIVEL: Record<string, string> = {
+  'PREESCOLAR': 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=600',
+  'PRIMARIA': 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=600',
+  'TECNICO': 'https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?q=80&w=600',
+  'BACHILLER': 'https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=600',
+  'TECNOLOGO': 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600',
+  'PREGRADO': 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?q=80&w=600',
+'POSTGRADO': 'https://images.unsplash.com/photo-1525921429624-479b6a26d84d?q=80&w=600',  
+};
+
+export const GestionProgramas = ({
+  onActionComplete = () => {} 
+}: {
+  onActionComplete?: () => void;
+}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [activeIndex, setActiveIndex] = useState(0);
+  const carouselRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchProgramas();
@@ -28,21 +38,20 @@ const GestionProgramas: React.FC = () => {
       setLoading(true);
       const response = await axios.get('/programas');
 
-
       if (response.data.status === 'success') {
-        const mappedData: Program[] = response.data.data.map((p: any) => ({
-          id: p.id,
-          name: p.nombrePrograma,
-          codigo: p.codigoPrograma,
-          status: p.estado?.nombre || 'ACTIVO',
-          nivel: p.nivel?.nombreNivel || 'N/A',
+        const mappedData: Program[] = response.data.data.map((p: any) => {
+          const nivelKey = p.nivel?.nombreNivel?.trim().toUpperCase() || 'DEFAULT';
           
-          formacion: p.tipo_formacion?.nombreTipoFormacion || 'N/A',
-          
-          imageUrl:
-            p.imageUrl ||
-            'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=500',
-        }));
+          return {
+            id: p.id,
+            name: p.nombrePrograma,
+            codigo: p.codigoPrograma,
+            status: p.estado?.nombre || 'ACTIVO',
+            nivel: p.nivel?.nombreNivel || 'N/A',
+            formacion: p.tipo_formacion?.nombreTipoFormacion || 'N/A',
+            imageUrl: IMAGENES_POR_NIVEL[nivelKey] || IMAGENES_POR_NIVEL['DEFAULT'],
+          };
+        });
 
         setPrograms(mappedData);
       }
@@ -53,11 +62,23 @@ const GestionProgramas: React.FC = () => {
     }
   };
 
+  const handleAddProgram = (newProgramFromDB: any) => {
+    // Lógica de imagen al crear uno nuevo
+    const nivelKey = newProgramFromDB.nivel?.nombreNivel?.trim().toUpperCase() || 'DEFAULT';
 
-  const handleAddProgram = (newProgram: Program) => {
+    const mappedNewProgram: Program = {
+      id: newProgramFromDB.id,
+      name: newProgramFromDB.nombrePrograma,
+      codigo: newProgramFromDB.codigoPrograma,
+      status: newProgramFromDB.estado?.nombre || 'ACTIVO',
+      nivel: newProgramFromDB.nivel?.nombreNivel || 'N/A',
+      formacion: newProgramFromDB.tipo_formacion?.nombreTipoFormacion || 'N/A',
+      imageUrl: IMAGENES_POR_NIVEL[nivelKey] || IMAGENES_POR_NIVEL['DEFAULT']
+    };
 
-    setPrograms((prev) => [...prev, newProgram]);
+    setPrograms((prev) => [...prev, mappedNewProgram]);
     setShowToast(true);
+    onActionComplete();
 
     setTimeout(() => {
       if (carouselRef.current) {
@@ -68,10 +89,6 @@ const GestionProgramas: React.FC = () => {
       }
     }, 100);
   };
-
-  const [searchTerm, setSearchTerm] = useState('');
-  const [activeIndex, setActiveIndex] = useState(0);
-  const carouselRef = useRef<HTMLDivElement>(null);
 
   const filteredPrograms = useMemo(() => {
     return programs.filter(p =>
@@ -99,10 +116,9 @@ const GestionProgramas: React.FC = () => {
 
   return (
     <div className="relative flex flex-col w-full h-screen min-h-screen p-4 md:p-8 bg-[#f3f4f7] dark:bg-coal-500 font-sans overflow-hidden">
-
+      
       <div className="absolute inset-0 z-0 pointer-events-none opacity-40 dark:opacity-20">
         <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(#a1a1aa 0.5px, transparent 0.5px)', backgroundSize: '30px 30px' }}></div>
-
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-500/10 blur-[120px] rounded-full -mr-64 -mt-64"></div>
         <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-indigo-500/10 blur-[120px] rounded-full -ml-64 -mb-64"></div>
       </div>
@@ -112,10 +128,7 @@ const GestionProgramas: React.FC = () => {
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
 
-      {/* CONTENIDO PRINCIPAL (Encima del fondo) */}
       <div className="relative z-10 flex flex-col w-full h-full">
-
-        {/* Título Principal */}
         <div className="w-full max-w-6xl mx-auto mb-6 text-center">
           <h1 className="text-3xl font-semibold tracking-tight text-gray-800 uppercase dark:text-white">
             Gestión de Programas
@@ -123,7 +136,6 @@ const GestionProgramas: React.FC = () => {
           <p className="mt-1 text-xs font-medium tracking-widest text-gray-500 uppercase">Configuración Académica</p>
         </div>
 
-        {/* Toolbar */}
         <div className="flex items-center justify-between w-full max-w-5xl gap-4 px-2 mx-auto mb-8">
           <div className="group flex items-center bg-white/80 backdrop-blur-md dark:bg-coal-300/80 border border-gray-200 dark:border-transparent rounded-full p-1.5 transition-all duration-500 ease-in-out w-[46px] hover:w-[280px] md:hover:w-[350px] focus-within:w-[280px] md:focus-within:w-[350px] shadow-sm overflow-hidden">
             <div className="flex items-center justify-center flex-shrink-0 w-8 h-8 text-gray-500 transition-colors group-hover:text-blue-600 group-focus-within:text-blue-600">
@@ -151,7 +163,6 @@ const GestionProgramas: React.FC = () => {
           </button>
         </div>
 
-        {/* Carrusel */}
         <div className="relative w-full max-w-[1200px] mx-auto flex-grow flex items-center px-4 md:px-10 overflow-hidden">
           <button onClick={() => scroll('left')} className="absolute z-50 items-center justify-center hidden w-10 h-10 text-gray-600 transition-all border border-transparent rounded-full shadow-xl bg-white/90 backdrop-blur-sm left-2 md:left-4 sm:flex dark:bg-coal-300 hover:scale-110 active:scale-95 dark:text-gray-300">
             <i className="text-xl ki-outline ki-left"></i>
@@ -166,21 +177,19 @@ const GestionProgramas: React.FC = () => {
               <div key={program.id} className="flex-shrink-0 snap-center w-[220px] h-[310px] group [perspective:1000px] transition-all duration-500">
                 <div className="relative w-full h-full transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] shadow-xl rounded-[1.25rem]">
 
-                  {/* FRENTE */}
-                  <div className="absolute inset-0 [backface-visibility:hidden] rounded-[1.25rem] overflow-hidden border border-gray-200/50 dark:border-transparent">
+                  <div className="absolute inset-0 [backface-visibility:hidden] rounded-[1.25rem] overflow-hidden border border-gray-400 dark:border-transparent">
                     <img src={program.imageUrl} alt={program.name} className="absolute inset-0 object-cover w-full h-full" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-transparent to-transparent" />
                     <div className="absolute inset-0 flex flex-col justify-end p-5 text-white">
                       <span className="w-fit px-3 py-1 mb-1.5 font-extrabold uppercase rounded-md text-[11px] bg-blue-600 tracking-wider shadow-sm">
-                        Programa
+                        {program.nivel}
                       </span>
                       <h3 className="text-sm font-bold leading-tight tracking-wide uppercase">{program.name}</h3>
                       <p className="font-semibold text-white/70 text-[9px] uppercase tracking-widest">{program.status}</p>
                     </div>
                   </div>
 
-                  {/* REVERSO */}
-                  <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)] bg-[#f8f9fa] dark:bg-coal-400 rounded-[1.25rem] p-5 flex flex-col border border-white dark:border-coal-300 shadow-inner">
+                  <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)] bg-[#f8f9fa] dark:bg-coal-400 rounded-[1.25rem] p-5 flex flex-col border border-gray-400 dark:border-coal-300 shadow-inner">
                     <div className="flex justify-between mb-4">
                       <button title="Periodos abiertos" className="flex items-center justify-center w-8 h-8 text-gray-600 transition-all border border-transparent rounded-lg dark:text-blue-300 bg-blue-100/30 dark:bg-blue-500/10 hover:border-blue-500 hover:scale-105 active:scale-95">
                         <i className="text-lg ki-outline ki-entrance-right"></i>
@@ -198,23 +207,15 @@ const GestionProgramas: React.FC = () => {
 
                     <div className="flex-grow space-y-3">
                       <div className="flex flex-col">
-                        <span className="text-[10px] font-bold text-gray-400 dark:text-gray-300 uppercase tracking-tighter">Cod.</span>
+                        <span className="text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase tracking-tighter">Cod.</span>
                         <span className="text-[11px] font-bold text-gray-700 dark:text-white leading-none">{program.codigo}</span>
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-[10px] font-bold text-gray-400 dark:text-gray-300 uppercase tracking-tighter">Nivel</span>
-                        <span className="text-[11px] font-bold text-gray-700 dark:text-white leading-none">{program.nivel}</span>
+                        <span className="text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase tracking-tighter">Formación</span>
+                        <span className="text-[11px] font-bold text-gray-700 dark:text-white leading-none">{program.formacion}</span>
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-[10px] font-bold text-gray-400 dark:text-gray-300 uppercase tracking-tighter">
-                          Formación
-                        </span>
-                        <span className="text-[11px] font-bold text-gray-700 dark:text-white leading-none">
-                          {program.formacion}
-                        </span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-[10px] font-bold text-gray-400 dark:text-gray-300 uppercase tracking-tighter">Estado</span>
+                        <span className="text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase tracking-tighter">Estado</span>
                         <span className="text-[11px] font-bold text-emerald-500 dark:text-emerald-400 uppercase tracking-wide">{program.status}</span>
                       </div>
                     </div>
@@ -235,7 +236,6 @@ const GestionProgramas: React.FC = () => {
           </button>
         </div>
 
-        {/* Indicadores */}
         <div className="flex justify-center gap-2 pb-6 mt-4">
           {filteredPrograms.map((_, idx) => (
             <button

@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { FormularioProgramaProps, CatalogosData } from './types';
 
-interface FormularioProgramaProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onAddProgram: (newProgram: any) => void;
-}
-
-const FormularioPrograma: React.FC<FormularioProgramaProps> = ({ isOpen, onClose, onAddProgram }) => {
-  const [catalogos, setCatalogos] = useState({
-    niveles: [] as any[],
-    tipos: [] as any[],
-    estados: [] as any[]
+export const FormularioPrograma = ({
+  isOpen,
+  onClose,
+  onAddProgram
+}: FormularioProgramaProps) => {
+  
+  const [catalogos, setCatalogos] = useState<CatalogosData>({
+    niveles: [],
+    tipos: [],
+    estados: []
   });
 
   const [formData, setFormData] = useState({
@@ -23,7 +23,6 @@ const FormularioPrograma: React.FC<FormularioProgramaProps> = ({ isOpen, onClose
     description: ''
   });
 
-  // 2. Carga de datos al abrir el modal
   useEffect(() => {
     if (isOpen) {
       cargarRecursos();
@@ -62,29 +61,23 @@ const FormularioPrograma: React.FC<FormularioProgramaProps> = ({ isOpen, onClose
       descripcionPrograma: formData.description
     };
 
-   try {
-      // 3. Envío al Backend
+    try {
       const response = await axios.post('/programas/guardar', payload); 
       
       if (response.data.status === 'success') {
-        alert("¡Programa creado satisfactoriamente!");
-        
-        // 4. Actualizar la tabla en el componente padre con los datos que devolvió Laravel
         onAddProgram(response.data.data);
-        
-        // 5. Limpiar formulario y cerrar
         setFormData({ name: '', codigo: '', formacion: '', nivel: '', status: '', description: '' });
         onClose();
       }
     } catch (error: any) {
       console.error("Error al guardar:", error.response?.data || error.message);
-      alert("Error al procesar la solicitud: " + (error.response?.data?.message || "Servidor no disponible"));
+      alert("Error al procesar: " + (error.response?.data?.message || "Servidor no disponible"));
     }
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-coal-black/40 backdrop-blur-sm p-4">
-      <div className="w-full max-w-lg overflow-hidden bg-white border border-gray-200 dark:bg-coal-600 rounded-xl shadow-modal dark:border-coal-100 animate-fade-in">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-coal-black/40 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+      <div className="w-full max-w-lg overflow-hidden bg-white border border-gray-200 dark:bg-coal-600 rounded-xl shadow-modal dark:border-coal-100">
         
         {/* Header */}
         <div className="flex items-center justify-between px-7.5 py-4 border-b border-gray-200 dark:border-coal-100 bg-gray-light-100 dark:bg-coal-200">
@@ -95,7 +88,6 @@ const FormularioPrograma: React.FC<FormularioProgramaProps> = ({ isOpen, onClose
         </div>
 
         <form className="p-7.5 space-y-5">
-          {/* Nombre y Código  */}
           <div className="flex flex-col gap-2">
             <label className="font-bold text-gray-700 uppercase text-2xs dark:text-gray-dark-700">Nombre del Programa</label>
             <textarea 
@@ -118,7 +110,6 @@ const FormularioPrograma: React.FC<FormularioProgramaProps> = ({ isOpen, onClose
             />
           </div>
 
-          {/* Selectores Dinámicos */}
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             <div className="flex flex-col gap-2">
               <label className="font-bold text-gray-700 uppercase text-2xs dark:text-gray-dark-700">Tipo Formación</label>
@@ -163,7 +154,6 @@ const FormularioPrograma: React.FC<FormularioProgramaProps> = ({ isOpen, onClose
             </select>
           </div>
 
-          {/* Descripción */}
           <div className="flex flex-col gap-2">
             <label className="font-bold text-gray-700 uppercase text-2xs dark:text-gray-dark-700">Descripción</label>
             <textarea 
@@ -177,10 +167,10 @@ const FormularioPrograma: React.FC<FormularioProgramaProps> = ({ isOpen, onClose
 
           <div className="flex items-center justify-center gap-3 pt-4">
             <button type="button" onClick={handleSubmit} className="px-10 font-bold tracking-widest uppercase btn btn-primary shadow-primary text-2xs">
-              <i className="ki-filled ki-plus"></i> Aceptar
+               Aceptar
             </button>
             <button type="button" onClick={onClose} className="px-10 font-bold tracking-widest uppercase btn btn-danger shadow-danger text-2xs">
-              <i className="ki-filled ki-cross-circle"></i> Cancelar
+               Cancelar
             </button>
           </div>
         </form>

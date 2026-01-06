@@ -94,6 +94,11 @@ import MultimediaPage from '@/pages/multimedia/gestion-multimedia/MultimediaPage
 import ProfesoresPage from '@/pages/profesores/profes/ProfesoresPage';
 import PeriodosPage from '@/pages/periodos/PeriodosPage';
 
+import DashboardCoordinador from '@/pages/cordinador/DashboardCordinador';
+import GestionProgramas from '@/pages/programas-academicos/GestionProgramas';
+import ProfesoresContent from '@/pages/profesores/profes/ProfesoresContent';
+import EstudiantesPage from '@/pages/estudiantes/EstudiantesPage';
+
 // Componentes temporales para pruebas
 
 const JornadasPage = () => (
@@ -107,10 +112,7 @@ const InfraestructuraPage = () => (
   </div>
 );
 
-import DashboardCoordinador from '@/pages/cordinador/DashboardCordinador';
-import GestionProgramas from '@/pages/programas-academicos/GestionProgramas';
-import ProfesoresContent from '@/pages/profesores/profes/ProfesoresContent';
-import EstudiantesPage from '@/pages/estudiantes/EstudiantesPage';
+
 
 // Configuración de prioridades de Dashboards
 // El orden importa: el primero que coincida será el que se muestre.
