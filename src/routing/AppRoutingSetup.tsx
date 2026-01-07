@@ -135,11 +135,7 @@ const DASHBOARD_CONFIG = [
   },
   {
     permission: 'GESTION_ESTUDIANTE',
-    component: (
-      <div className="p-8">
-        <h2>Dashboard de Estudiante - Próximamente</h2>
-      </div>
-    )
+    component: <EstudiantesPage />
   }
 ];
 const AppRoutingSetup = (): ReactElement => {
