@@ -7,6 +7,10 @@ export interface Program {
   codigo: string;
   nivel: string;
   formacion: string;
+  description?: string; 
+  idNivelEducativo?: number | string;
+  idTipoFormacion?: number | string;
+  idEstadoPrograma?: number | string;
 }
 
 // Props para el componente principal GestionProgramas
@@ -19,6 +23,8 @@ export interface FormularioProgramaProps {
   isOpen: boolean;
   onClose: () => void;
   onAddProgram: (newProgram: any) => void;
+  programToEdit?: Program | null; 
+  onUpdateProgram?: (updatedProgram: any) => void;
 }
 
 // Props para el componente Toast
@@ -30,7 +36,7 @@ export interface ToastProps {
 
 // Tipos auxiliares para los catálogos del Formulario
 export interface CatalogoItem {
-  id: number;
+  id: number | string;
   nombre: string;
 }
 
