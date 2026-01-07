@@ -1,6 +1,7 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import axios from 'axios';
 import FormularioPrograma from './components/FormularioPrograma';
+import ConfirmarEliminar from './components/ConfirmarEliminar'; 
 import Toast from './components/Toast';
 import { Program } from './types';
 
@@ -20,13 +21,17 @@ export const GestionProgramas = ({
   onActionComplete?: () => void;
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
   const [programToEdit, setProgramToEdit] = useState<Program | null>(null);
+  const [programToDelete, setProgramToDelete] = useState<Program | null>(null);
+  
   const carouselRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -79,19 +84,25 @@ export const GestionProgramas = ({
     onActionComplete();
   };
 
-  const handleDelete = async (id: number) => {
-    if (window.confirm("¿Está seguro de que desea eliminar este programa?")) {
-      try {
-        const response = await axios.delete(`/programas_eliminar/${id}`);
-        if (response.data.status === 'success') {
-          setPrograms(prev => prev.filter(p => p.id !== id));
-          setToastMessage("Programa eliminado correctamente");
-          setShowToast(true);
-          onActionComplete();
-        }
-      } catch (error) {
-        alert("No se pudo eliminar el programa. Verifique si tiene datos asociados.");
+  const openDeleteConfirm = (program: Program) => {
+    setProgramToDelete(program);
+    setIsConfirmOpen(true);
+  };
+
+  const handleExecuteDelete = async () => {
+    if (!programToDelete) return;
+    try {
+      const response = await axios.delete(`/programas_eliminar/${programToDelete.id}`);
+      if (response.data.status === 'success') {
+        setPrograms(prev => prev.filter(p => p.id !== programToDelete.id));
+        setToastMessage(`Programa "${programToDelete.name}" eliminado`);
+        setShowToast(true);
+        onActionComplete();
       }
+    } catch (error) {
+      alert("No se pudo eliminar el programa. Verifique dependencias.");
+    } finally {
+      setProgramToDelete(null);
     }
   };
 
@@ -126,7 +137,7 @@ export const GestionProgramas = ({
 
   return (
     <div className="relative flex flex-col w-full h-screen min-h-screen p-4 md:p-8 bg-[#f3f4f7] dark:bg-coal-500 font-sans overflow-hidden">
-      {/* Background Decor */}
+      
       <div className="absolute inset-0 z-0 pointer-events-none opacity-40 dark:opacity-20">
         <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(#a1a1aa 0.5px, transparent 0.5px)', backgroundSize: '30px 30px' }}></div>
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-500/10 blur-[120px] rounded-full -mr-64 -mt-64"></div>
@@ -140,11 +151,10 @@ export const GestionProgramas = ({
           <p className="mt-1 text-xs font-medium tracking-widest text-gray-500 uppercase">Configuración Académica</p>
         </div>
 
-        {/* Buscador y Botón Añadir */}
         <div className="flex items-center justify-between w-full max-w-5xl gap-4 px-2 mx-auto mb-8">
-          <div className="group flex items-center bg-white/80 backdrop-blur-md dark:bg-coal-300/80 border border-gray-200 dark:border-transparent rounded-full p-1.5 transition-all duration-500 ease-in-out w-[46px] hover:w-[280px] md:hover:w-[350px] shadow-sm overflow-hidden">
-            <div className="flex items-center justify-center flex-shrink-0 w-8 h-8 text-gray-500 group-hover:text-blue-600"><i className="text-xl ki-outline ki-magnifier"></i></div>
-            <input type="text" placeholder="Buscar programa..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full px-3 text-sm font-medium transition-opacity bg-transparent border-none outline-none opacity-0 group-hover:opacity-100 dark:text-white" />
+          <div className="group flex items-center bg-white/80 backdrop-blur-md dark:bg-coal-300/80 border border-gray-200 dark:border-transparent rounded-full p-1.5 transition-all duration-500 ease-in-out w-[46px] hover:w-[280px] md:hover:w-[350px] focus-within:w-[280px] md:focus-within:w-[350px] shadow-sm overflow-hidden">
+            <div className="flex items-center justify-center flex-shrink-0 w-8 h-8 text-gray-500 transition-colors group-hover:text-blue-600"><i className="text-xl ki-outline ki-magnifier"></i></div>
+            <input type="text" placeholder="Buscar programa..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full px-3 text-sm font-medium transition-opacity bg-transparent border-none outline-none opacity-0 group-hover:opacity-100 focus:opacity-100 dark:text-white" />
           </div>
 
           <button onClick={() => { setProgramToEdit(null); setIsModalOpen(true); }} className="group relative flex items-center justify-start h-[46px] w-[46px] hover:w-[180px] bg-blue-600 text-white rounded-full transition-all duration-500 shadow-lg active:scale-95">
@@ -153,7 +163,7 @@ export const GestionProgramas = ({
           </button>
         </div>
 
-        {/* Carrusel */}
+        {/* Carousel Container */}
         <div className="relative w-full max-w-[1200px] mx-auto flex-grow flex items-center px-4 md:px-10 overflow-hidden">
           <button onClick={() => scroll('left')} className="absolute z-50 items-center justify-center hidden w-10 h-10 text-gray-600 border border-transparent rounded-full shadow-xl bg-white/90 left-2 md:left-4 sm:flex dark:bg-coal-300 hover:scale-110 active:scale-95"><i className="text-xl ki-outline ki-left"></i></button>
 
@@ -162,7 +172,7 @@ export const GestionProgramas = ({
               <div key={program.id} className="flex-shrink-0 snap-center w-[220px] h-[310px] group [perspective:1000px]">
                 <div className="relative w-full h-full transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] shadow-xl rounded-[1.25rem]">
                   
-                  {/* FRONT: Vista previa */}
+                  {/* FRONT CARD */}
                   <div className="absolute inset-0 [backface-visibility:hidden] rounded-[1.25rem] overflow-hidden border border-gray-400 dark:border-transparent">
                     <img src={program.imageUrl} alt="" className="absolute inset-0 object-cover w-full h-full" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-transparent to-transparent" />
@@ -173,7 +183,7 @@ export const GestionProgramas = ({
                     </div>
                   </div>
 
-                  {/* BACK: Acciones y Detalles */}
+                  {/* BACK CARD */}
                   <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)] bg-[#f8f9fa] dark:bg-coal-400 rounded-[1.25rem] p-5 flex flex-col border border-gray-400 dark:border-coal-300 shadow-inner">
                     <div className="flex justify-between mb-4">
                       <button title="Periodos abiertos" className="flex items-center justify-center w-8 h-8 text-gray-600 border border-transparent rounded-lg dark:text-blue-300 bg-blue-100/30 dark:bg-blue-500/10 hover:border-blue-500 hover:scale-105 active:scale-95"><i className="text-lg ki-outline ki-entrance-right"></i></button>
@@ -188,9 +198,7 @@ export const GestionProgramas = ({
                       <div className="flex flex-col"><span className="text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase tracking-tighter">Estado</span><span className="text-[11px] font-bold text-emerald-500 dark:text-emerald-400 uppercase tracking-wide">{program.status}</span></div>
                     </div>
 
-                    {/* Footer de la tarjeta con Botones de Acción */}
                     <div className="flex justify-between gap-2 pt-3 mt-auto border-t border-gray-100 dark:border-coal-200">
-                      {/* BOTÓN ACTUALIZAR */}
                       <button 
                         onClick={() => openEditModal(program)}
                         title="Actualizar" 
@@ -199,16 +207,14 @@ export const GestionProgramas = ({
                         <i className="ki-outline ki-arrows-loop"></i>
                       </button>
 
-                      {/* BOTÓN ELIMINAR */}
                       <button 
-                        onClick={() => handleDelete(program.id)}
+                        onClick={() => openDeleteConfirm(program)}
                         title="Eliminar" 
                         className="flex items-center justify-center flex-1 py-1.5 text-red-500 transition-all border border-transparent bg-red-50/50 dark:bg-red-500/10 rounded-lg hover:border-red-500 hover:scale-105"
                       >
                         <i className="ki-outline ki-trash"></i>
                       </button>
 
-                      {/* BOTÓN INFORMACIÓN */}
                       <button title="Información" className="flex items-center justify-center flex-1 py-1.5 text-blue-600 transition-all border border-transparent bg-blue-50/50 dark:bg-blue-500/10 rounded-lg hover:border-blue-600 hover:scale-105">
                         <i className="ki-outline ki-eye"></i>
                       </button>
@@ -223,12 +229,21 @@ export const GestionProgramas = ({
         </div>
       </div>
 
+      {/* MODAL DE FORMULARIO (CREAR/EDITAR) */}
       <FormularioPrograma
         isOpen={isModalOpen}
         onClose={() => { setIsModalOpen(false); setProgramToEdit(null); }}
         onAddProgram={handleAddProgram}
         onUpdateProgram={handleUpdateProgram}
         programToEdit={programToEdit}
+      />
+
+      {/* MODAL DE CONFIRMACIÓN DE ELIMINACIÓN */}
+      <ConfirmarEliminar 
+        isOpen={isConfirmOpen}
+        onClose={() => { setIsConfirmOpen(false); setProgramToDelete(null); }}
+        onConfirm={handleExecuteDelete}
+        nombrePrograma={programToDelete?.name}
       />
 
       <Toast
