@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { ToastProps } from './types'; 
+import { ToastProps } from '../types'; 
 
 export const Toast = ({ message, isOpen, onClose }: ToastProps) => {
   useEffect(() => {

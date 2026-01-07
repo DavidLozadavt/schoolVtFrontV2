@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FormularioProgramaProps, CatalogosData } from './types';
+import { FormularioProgramaProps, CatalogosData } from '../types';
 
 export const FormularioPrograma = ({
   isOpen,
@@ -31,7 +31,7 @@ export const FormularioPrograma = ({
 
   const cargarRecursos = async () => {
     try {
-      const response = await axios.get('/programas/recursos-crear');
+      const response = await axios.get('programas_recursos_crear');
       if (response.data.status === 'success') {
         setCatalogos({
           niveles: response.data.data.niveles_educativos,
@@ -62,7 +62,7 @@ export const FormularioPrograma = ({
     };
 
     try {
-      const response = await axios.post('/programas/guardar', payload); 
+      const response = await axios.post('programas_guardar', payload); 
       
       if (response.data.status === 'success') {
         onAddProgram(response.data.data);

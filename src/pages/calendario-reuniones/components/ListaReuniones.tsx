@@ -1,20 +1,16 @@
 import React from 'react';
 import { Task } from '../types'; 
 
-// Ya no es necesario exportar esta función, simplificamos la lógica.
 const getTaskStatus = (task: Task) => {
-    // Si la fecha de la tarea es anterior a hoy, está Finalizada. De lo contrario, Programada.
     const taskDate = new Date(task.start + ' ' + task.time).getTime();
     const now = new Date().getTime();
     
-    // Asumimos que si la duración es 0 o ya pasó, está "Finalizada"
     if (task.duration === 0 || now > taskDate + (task.duration * 60000)) {
         return "Finalizada";
     }
     return "Programada";
 };
 
-// 🗓️ COMPONENTE DEL ELEMENTO INDIVIDUAL
 interface MeetingItemProps {
   task: Task;
 }
@@ -42,7 +38,6 @@ const MeetingItem: React.FC<MeetingItemProps> = ({ task }) => {
         {task.start} <span className="font-bold">@ {task.time}</span> ({task.duration} min)
       </span>
 
-      {/* ELIMINACIÓN DE BOTONES DE UNIRSE */}
       <div className="mt-3">
           <span className={`text-center text-sm font-medium ${isCompleted ? 'text-green-600 dark:text-green-400' : 'text-blue-600 dark:text-blue-400'}`}>
               {isCompleted ? '✅ Tarea Finalizada' : '⏳ Tarea Programada'}
@@ -53,16 +48,14 @@ const MeetingItem: React.FC<MeetingItemProps> = ({ task }) => {
 };
 
 
-// 📚 COMPONENTE PRINCIPAL DE LA LISTA
 interface ListaReunionesProps {
   tasks: Task[];
-  activeMeetingId: string | undefined; // Mantenemos la prop pero no la usamos
+  activeMeetingId: string | undefined; 
   onScheduleClick: () => void; 
 }
 
 const ListaReuniones: React.FC<ListaReunionesProps> = ({ tasks, onScheduleClick }) => {
   return (
-    // Se mantiene el modo oscuro
     <div className="flex-shrink-0 w-full p-4 transition-colors bg-white border border-gray-200 shadow-xl lg:w-80 dark:bg-gray-100 dark:border-gray-700 rounded-xl">
      <h2 className="flex items-center mb-4 text-2xl font-extrabold text-gray-900 dark:text-gray-900">
         Mis Reuniones

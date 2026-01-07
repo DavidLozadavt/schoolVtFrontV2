@@ -1,7 +1,7 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import axios from 'axios';
-import FormularioPrograma from './FormularioPrograma';
-import Toast from './Toast';
+import FormularioPrograma from './components/FormularioPrograma';
+import Toast from './components/Toast';
 import { Program, GestionProgramasProps } from './types';
 
 
