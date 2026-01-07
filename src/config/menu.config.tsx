@@ -649,11 +649,6 @@ export const MENU_SIDEBAR: TMenuConfig = [
         path: '/profesores',
         requiredPermissions: ['GESTION_REPORTE_SUPERINTENDENCIA']
       },
-      {
-        title:'Estudiantes',
-        path:'/estudiantes',
-        requiredPermissions: ['GESTION_REPORTE_SUPERINTENDENCIA']
-      } 
     ]
   },
 
