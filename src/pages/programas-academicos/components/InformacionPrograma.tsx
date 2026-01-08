@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Program } from '../types';
 
 interface InformacionProgramaProps {
@@ -8,24 +8,27 @@ interface InformacionProgramaProps {
 }
 
 const InformacionPrograma = ({ isOpen, onClose, program }: InformacionProgramaProps) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   if (!isOpen || !program) return null;
 
-  const isLongDescription = (program.description?.length || 0) > 60;
+  const descriptionText = program.description || 'SIN DESCRIPCIÓN';
+  const isLongDescription = descriptionText.length > 60;
 
-  const CardContainer = ({ children, label }: { children: React.ReactNode; label: string }) => (
-    <div className="flex flex-col h-[85px] p-3 transition-all border rounded-xl bg-white dark:bg-black/20 border-gray-200 dark:border-white/5 shadow-sm hover:shadow-md">
-      <span className="text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-auto">
+  const CardContainer = ({ children, label, isDescription = false }: { children: React.ReactNode; label: string, isDescription?: boolean }) => (
+    <div className={`flex flex-col transition-all duration-300 border rounded-xl bg-white dark:bg-black/20 border-blue-200 dark:border-white/5 shadow-sm hover:shadow-md p-3 ${isDescription && isExpanded ? 'h-auto min-h-[85px]' : 'h-[85px]'}`}>
+      <span className="text-[9px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-auto">
         {label}
       </span>
-      <div className="flex items-center overflow-hidden">
+      <div className={`flex flex-col justify-center ${isDescription && isExpanded ? '' : 'overflow-hidden'}`}>
         {children}
       </div>
     </div>
   );
 
   const ActionItem = ({ label }: { label: string }) => (
-    <div className="flex flex-col h-[85px] p-3 border border-dashed rounded-xl bg-gray-50/50 dark:bg-white/5 border-gray-300 dark:border-white/10 shadow-sm">
-      <span className="text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-auto">
+    <div className="flex flex-col h-[85px] p-3 border border-dashed rounded-xl bg-gray-50/50 dark:bg-white/5 border-gray-400 dark:border-white/10 shadow-sm">
+      <span className="text-[9px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-auto">
         {label}
       </span>
       <button className="flex items-center justify-between w-full px-3 py-1.5 text-[9px] font-bold text-gray-700 uppercase transition-all bg-white border border-gray-200 shadow-sm rounded-lg dark:bg-coal-500 dark:border-white/10 dark:text-white hover:bg-primary hover:text-white hover:border-primary active:scale-95 group">
@@ -37,9 +40,10 @@ const InformacionPrograma = ({ isOpen, onClose, program }: InformacionProgramaPr
 
   return (
     <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-coal-black/40 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="relative w-full max-w-3xl overflow-hidden bg-white border border-gray-200 shadow-2xl dark:bg-coal-600 rounded-2xl dark:border-white/5">
+      <div className="relative w-full max-w-3xl overflow-hidden bg-gray-100 border border-gray-200 shadow-2xl dark:bg-coal-600 rounded-2xl dark:border-white/5">
         
-        <div className="flex items-center justify-between px-6 py-4 bg-gray-300 border-b border-gray-200 dark:bg-black/20 dark:border-white/5">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 bg-blue-100 border-b border-gray-200 dark:bg-black/30 dark:border-white/5">
           <div className="flex flex-col gap-0.5">
             <h2 className="text-lg font-black tracking-tighter text-gray-900 uppercase dark:text-white">
               Ficha de Información
@@ -54,7 +58,7 @@ const InformacionPrograma = ({ isOpen, onClose, program }: InformacionProgramaPr
           </button>
         </div>
 
-        {/* Grid ajustado */}
+        {/* Grid de Contenido */}
         <div className="grid grid-cols-1 md:grid-cols-3 p-6 bg-gray-50/30 dark:bg-transparent gap-4 max-h-[70vh] overflow-y-auto">
           
           <CardContainer label="Nombre Programa">
@@ -62,43 +66,46 @@ const InformacionPrograma = ({ isOpen, onClose, program }: InformacionProgramaPr
           </CardContainer>
           
           <CardContainer label="Código Programa">
-            <span className="text-xs font-bold text-gray-800 uppercase dark:text-gray-100">{program.codigo}</span>
+            <span className="text-xs font-bold text-gray-700 uppercase dark:text-white">{program.codigo}</span>
           </CardContainer>
 
           <ActionItem label="Asignaciones Periodo" />
 
           <CardContainer label="Apertura Programa">
             <span className={`text-xs font-bold uppercase ${program.status === 'ACTIVO' ? 'text-success' : 'text-danger'}`}>
-              {program.status === 'ACTIVO' ? 'HABILITADO' : 'false'}
+              {program.status === 'ACTIVO' ? 'HABILITADO' : 'SUSPENDIDO'}
             </span>
           </CardContainer>
 
           <CardContainer label="Nivel Educativo">
-            <span className="text-xs font-bold text-gray-800 uppercase dark:text-gray-100">{program.nivel}</span>
+            <span className="text-xs font-bold text-gray-700 uppercase dark:text-white">{program.nivel}</span>
           </CardContainer>
 
           <ActionItem label="Estado Programa" />
 
-          <CardContainer label="Descripción Programa">
-            {isLongDescription ? (
-              <button className="flex items-center justify-between w-full px-2 py-1 text-[8px] font-bold text-primary uppercase border border-primary/20 rounded-md hover:bg-primary hover:text-white transition-all">
-                Ver Detalles <i className="ki-filled ki-text-align-left text-[10px]"></i>
+          {/* Tarjeta de Descripción */}
+          <CardContainer label="Descripción Programa" isDescription>
+            <p className={`text-[10px] font-semibold text-gray-700 uppercase dark:text-white ${isExpanded ? '' : 'line-clamp-2'}`}>
+              {descriptionText}
+            </p>
+            {isLongDescription && (
+              <button 
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="mt-1 text-[8px] font-bold text-primary uppercase hover:underline w-fit"
+              >
+                {isExpanded ? 'Ver menos' : 'Ver detalles'}
               </button>
-            ) : (
-              <p className="text-[10px] font-semibold text-gray-600 uppercase dark:text-gray-400 line-clamp-2">
-                {program.description || 'SIN DESCRIPCIÓN'}
-              </p>
             )}
           </CardContainer>
 
           <CardContainer label="Tipo de Formación">
-            <span className="text-xs font-bold text-gray-800 uppercase dark:text-gray-100">{program.formacion}</span>
+            <span className="text-xs font-bold text-gray-700 uppercase dark:text-white">{program.formacion}</span>
           </CardContainer>
 
           <ActionItem label="Procesos" />
         </div>
 
-        {/* Footer más compacto */}
+        {/* Footer */}
         <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-gray-100/50 dark:bg-black/20 dark:border-white/5">
           <div className="flex items-center gap-2 px-3 py-1 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-coal-500">
             <i className="text-xs text-primary ki-outline ki-fingerprint"></i>
