@@ -1,0 +1,116 @@
+import React from 'react';
+import { Program } from '../types';
+
+interface InformacionProgramaProps {
+  isOpen: boolean;
+  onClose: () => void;
+  program: Program | null;
+}
+
+const InformacionPrograma = ({ isOpen, onClose, program }: InformacionProgramaProps) => {
+  if (!isOpen || !program) return null;
+
+  const isLongDescription = (program.description?.length || 0) > 60;
+
+  const CardContainer = ({ children, label }: { children: React.ReactNode; label: string }) => (
+    <div className="flex flex-col h-[85px] p-3 transition-all border rounded-xl bg-white dark:bg-black/20 border-gray-200 dark:border-white/5 shadow-sm hover:shadow-md">
+      <span className="text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-auto">
+        {label}
+      </span>
+      <div className="flex items-center overflow-hidden">
+        {children}
+      </div>
+    </div>
+  );
+
+  const ActionItem = ({ label }: { label: string }) => (
+    <div className="flex flex-col h-[85px] p-3 border border-dashed rounded-xl bg-gray-50/50 dark:bg-white/5 border-gray-300 dark:border-white/10 shadow-sm">
+      <span className="text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-auto">
+        {label}
+      </span>
+      <button className="flex items-center justify-between w-full px-3 py-1.5 text-[9px] font-bold text-gray-700 uppercase transition-all bg-white border border-gray-200 shadow-sm rounded-lg dark:bg-coal-500 dark:border-white/10 dark:text-white hover:bg-primary hover:text-white hover:border-primary active:scale-95 group">
+        Ver Más
+        <i className="transition-transform ki-filled ki-right text-[10px] group-hover:translate-x-1"></i>
+      </button>
+    </div>
+  );
+
+  return (
+    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-coal-black/40 backdrop-blur-sm animate-in fade-in duration-300">
+      <div className="relative w-full max-w-3xl overflow-hidden bg-white border border-gray-200 shadow-2xl dark:bg-coal-600 rounded-2xl dark:border-white/5">
+        
+        <div className="flex items-center justify-between px-6 py-4 bg-gray-300 border-b border-gray-200 dark:bg-black/20 dark:border-white/5">
+          <div className="flex flex-col gap-0.5">
+            <h2 className="text-lg font-black tracking-tighter text-gray-900 uppercase dark:text-white">
+              Ficha de Información
+            </h2>
+            <div className="flex items-center gap-2">
+              <span className="w-4 h-1 rounded-full bg-primary"></span>
+              <p className="text-[9px] text-gray-500 font-bold uppercase tracking-[0.2em]">Parámetros del Programa</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="flex items-center justify-center w-8 h-8 transition-all border rounded-lg shadow-sm bg-danger/10 text-danger border-danger/20 hover:bg-danger hover:text-white">
+            <i className="text-lg ki-filled ki-cross"></i>
+          </button>
+        </div>
+
+        {/* Grid ajustado */}
+        <div className="grid grid-cols-1 md:grid-cols-3 p-6 bg-gray-50/30 dark:bg-transparent gap-4 max-h-[70vh] overflow-y-auto">
+          
+          <CardContainer label="Nombre Programa">
+            <span className="text-xs font-bold uppercase truncate text-primary">{program.name}</span>
+          </CardContainer>
+          
+          <CardContainer label="Código Programa">
+            <span className="text-xs font-bold text-gray-800 uppercase dark:text-gray-100">{program.codigo}</span>
+          </CardContainer>
+
+          <ActionItem label="Asignaciones Periodo" />
+
+          <CardContainer label="Apertura Programa">
+            <span className={`text-xs font-bold uppercase ${program.status === 'ACTIVO' ? 'text-success' : 'text-danger'}`}>
+              {program.status === 'ACTIVO' ? 'HABILITADO' : 'false'}
+            </span>
+          </CardContainer>
+
+          <CardContainer label="Nivel Educativo">
+            <span className="text-xs font-bold text-gray-800 uppercase dark:text-gray-100">{program.nivel}</span>
+          </CardContainer>
+
+          <ActionItem label="Estado Programa" />
+
+          <CardContainer label="Descripción Programa">
+            {isLongDescription ? (
+              <button className="flex items-center justify-between w-full px-2 py-1 text-[8px] font-bold text-primary uppercase border border-primary/20 rounded-md hover:bg-primary hover:text-white transition-all">
+                Ver Detalles <i className="ki-filled ki-text-align-left text-[10px]"></i>
+              </button>
+            ) : (
+              <p className="text-[10px] font-semibold text-gray-600 uppercase dark:text-gray-400 line-clamp-2">
+                {program.description || 'SIN DESCRIPCIÓN'}
+              </p>
+            )}
+          </CardContainer>
+
+          <CardContainer label="Tipo de Formación">
+            <span className="text-xs font-bold text-gray-800 uppercase dark:text-gray-100">{program.formacion}</span>
+          </CardContainer>
+
+          <ActionItem label="Procesos" />
+        </div>
+
+        {/* Footer más compacto */}
+        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-gray-100/50 dark:bg-black/20 dark:border-white/5">
+          <div className="flex items-center gap-2 px-3 py-1 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-coal-500">
+            <i className="text-xs text-primary ki-outline ki-fingerprint"></i>
+            <span className="text-[8px] font-bold text-gray-500 dark:text-gray-300 uppercase tracking-widest">ID: {program.id}</span>
+          </div>
+          <button onClick={onClose} className="flex items-center gap-2 px-6 py-2 font-bold text-white uppercase transition-all bg-primary hover:bg-primary-active rounded-xl shadow-lg text-[9px] tracking-widest active:scale-95">
+            Cerrar <i className="text-xs ki-filled ki-exit-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default InformacionPrograma;

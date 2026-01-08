@@ -4,6 +4,7 @@ import FormularioPrograma from './components/FormularioPrograma';
 import ConfirmarEliminar from './components/ConfirmarEliminar'; 
 import Toast from './components/Toast';
 import { Program } from './types';
+import InformacionPrograma from './components/InformacionPrograma';
 
 const IMAGENES_POR_NIVEL: Record<string, string> = {
   'PREESCOLAR': 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=600',
@@ -20,6 +21,10 @@ export const GestionProgramas = ({
 }: {
   onActionComplete?: () => void;
 }) => {
+
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
+  const [selectedInfoProgram, setSelectedInfoProgram] = useState<Program | null>(null);
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
@@ -135,6 +140,12 @@ export const GestionProgramas = ({
     }
   };
 
+  //  Función para abrir la info
+  const handleOpenInfo = (program: Program) => {
+    setSelectedInfoProgram(program);
+    setIsInfoOpen(true);
+  };
+  
   return (
     <div className="relative flex flex-col w-full h-screen min-h-screen p-4 md:p-8 bg-[#f3f4f7] dark:bg-coal-500 font-sans overflow-hidden">
       
@@ -215,7 +226,9 @@ export const GestionProgramas = ({
                         <i className="ki-outline ki-trash"></i>
                       </button>
 
-                      <button title="Información" className="flex items-center justify-center flex-1 py-1.5 text-blue-600 transition-all border border-transparent bg-blue-50/50 dark:bg-blue-500/10 rounded-lg hover:border-blue-600 hover:scale-105">
+                      <button title="Información" 
+                      onClick={() => handleOpenInfo(program)}
+                      className="flex items-center justify-center flex-1 py-1.5 text-blue-600 transition-all border border-transparent bg-blue-50/50 dark:bg-blue-500/10 rounded-lg hover:border-blue-600 hover:scale-105">
                         <i className="ki-outline ki-eye"></i>
                       </button>
                     </div>
@@ -250,6 +263,13 @@ export const GestionProgramas = ({
         message={toastMessage}
         isOpen={showToast}
         onClose={() => setShowToast(false)}
+      />
+      
+      {/* 4. Renderizar el componente al final */}
+      <InformacionPrograma 
+        isOpen={isInfoOpen}
+        onClose={() => setIsInfoOpen(false)}
+        program={selectedInfoProgram}
       />
     </div>
   );
