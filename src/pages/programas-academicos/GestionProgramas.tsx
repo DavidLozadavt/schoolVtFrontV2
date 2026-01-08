@@ -163,7 +163,7 @@ export const GestionProgramas = ({
         </div>
 
         <div className="flex items-center justify-between w-full max-w-5xl gap-4 px-2 mx-auto mb-8">
-          <div className="group flex items-center bg-white/80 backdrop-blur-md dark:bg-coal-300/80 border border-gray-200 dark:border-transparent rounded-full p-1.5 transition-all duration-500 ease-in-out w-[46px] hover:w-[280px] md:hover:w-[350px] focus-within:w-[280px] md:focus-within:w-[350px] shadow-sm overflow-hidden">
+          <div className="group flex items-center bg-white/80 backdrop-blur-md dark:bg-coal-300/80 border border-gray-400 dark:border-gray-800 rounded-full p-1.5 transition-all duration-500 ease-in-out w-[46px] hover:w-[280px] md:hover:w-[350px] focus-within:w-[280px] md:focus-within:w-[350px] shadow-sm overflow-hidden">
             <div className="flex items-center justify-center flex-shrink-0 w-8 h-8 text-gray-500 transition-colors group-hover:text-blue-600"><i className="text-xl ki-outline ki-magnifier"></i></div>
             <input type="text" placeholder="Buscar programa..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full px-3 text-sm font-medium transition-opacity bg-transparent border-none outline-none opacity-0 group-hover:opacity-100 focus:opacity-100 dark:text-white" />
           </div>
