@@ -16,7 +16,7 @@ const InformacionPrograma = ({ isOpen, onClose, program }: InformacionProgramaPr
   const isLongDescription = descriptionText.length > 60;
 
   const CardContainer = ({ children, label, isDescription = false }: { children: React.ReactNode; label: string, isDescription?: boolean }) => (
-    <div className={`flex flex-col transition-all duration-300 border rounded-xl bg-white dark:bg-black/20 border-blue-200 dark:border-white/5 shadow-sm hover:shadow-md p-3 ${isDescription && isExpanded ? 'h-auto min-h-[85px]' : 'h-[85px]'}`}>
+    <div className={`flex flex-col transition-all duration-300 border rounded-xl bg-gray-200 dark:bg-black/20 border-blue-200 dark:border-white/5 shadow-sm hover:shadow-md  p-3 ${isDescription && isExpanded ? 'h-auto min-h-[85px]' : 'h-[85px]'}`}>
       <span className="text-[9px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-auto">
         {label}
       </span>
@@ -27,7 +27,7 @@ const InformacionPrograma = ({ isOpen, onClose, program }: InformacionProgramaPr
   );
 
   const ActionItem = ({ label }: { label: string }) => (
-    <div className="flex flex-col h-[85px] p-3 border border-dashed rounded-xl bg-gray-50/50 dark:bg-white/5 border-gray-400 dark:border-white/10 shadow-sm">
+    <div className="flex flex-col h-[85px] p-3 border border-dashed rounded-xl bg-gray-200 dark:bg-white/5 border-gray-400 dark:border-white/10 shadow-sm">
       <span className="text-[9px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-auto">
         {label}
       </span>
@@ -43,7 +43,7 @@ const InformacionPrograma = ({ isOpen, onClose, program }: InformacionProgramaPr
       <div className="relative w-full max-w-3xl overflow-hidden bg-gray-100 border border-gray-200 shadow-2xl dark:bg-coal-600 rounded-2xl dark:border-white/5">
         
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-blue-100 border-b border-gray-200 dark:bg-black/30 dark:border-white/5">
+        <div className="flex items-center justify-between px-6 py-4 bg-blue-100 border-b border-gray-200 dark:bg-gray-100 dark:border-white/5">
           <div className="flex flex-col gap-0.5">
             <h2 className="text-lg font-black tracking-tighter text-gray-900 uppercase dark:text-white">
               Ficha de Información

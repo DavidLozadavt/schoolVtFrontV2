@@ -111,9 +111,10 @@ export const FormularioPrograma = ({
           <h2 className="font-semibold tracking-wider text-gray-900 uppercase text-md dark:text-gray-dark-900">
             {programToEdit ? 'Actualizar Programa' : 'Crear Programa'}
           </h2>
-          <button onClick={onClose} className="transition-colors btn btn-sm btn-icon btn-light btn-clear hover:text-danger">
-            <i className="text-lg ki-outline ki-cross"></i>
+           <button onClick={onClose} className="flex items-center justify-center w-8 h-8 transition-all border rounded-lg shadow-sm bg-danger/10 text-danger border-danger/20 hover:bg-danger hover:text-white">
+            <i className="text-lg ki-filled ki-cross"></i>
           </button>
+          
         </div>
 
         <form className="p-7.5 space-y-5">
