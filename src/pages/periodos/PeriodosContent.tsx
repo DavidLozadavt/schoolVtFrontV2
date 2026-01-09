@@ -183,14 +183,8 @@ const PeriodosContent: React.FC<PeriodosProps> = ({ reload = false }) => {
 
   const filteredData = useMemo(() => {
     if (!searchTerm) return periodos;
-    const lower = searchTerm.toLowerCase();
-    return periodos.filter(
-      (p) =>
-        p.nombrePeriodo.toLowerCase().includes(lower) ||
-        p.fechaInicial.toLowerCase().includes(lower) ||
-        p.fechaFinal.toLowerCase().includes(lower) ||
-        p.id.toLowerCase().includes(lower)
-    );
+
+    return periodos.filter((p) => p.nombrePeriodo.toLowerCase().includes(searchTerm.toLowerCase()));
   }, [searchTerm, periodos]);
 
   if (loading) {
