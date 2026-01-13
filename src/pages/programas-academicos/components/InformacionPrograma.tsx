@@ -45,9 +45,7 @@ const InformacionPrograma = ({ isOpen, onClose, program }: InformacionProgramaPr
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 bg-blue-100 border-b border-gray-200 dark:bg-gray-100 dark:border-white/5">
           <div className="flex flex-col gap-0.5">
-            <h2 className="text-lg font-black tracking-tighter text-gray-900 uppercase dark:text-white">
-              Ficha de Información
-            </h2>
+            <h2 className="text-lg font-black tracking-tighter text-gray-900 uppercase dark:text-white">Ficha de Información</h2>
             <div className="flex items-center gap-2">
               <span className="w-4 h-1 rounded-full bg-primary"></span>
               <p className="text-[9px] text-gray-500 font-bold uppercase tracking-[0.2em]">Parámetros del Programa</p>
@@ -58,7 +56,6 @@ const InformacionPrograma = ({ isOpen, onClose, program }: InformacionProgramaPr
           </button>
         </div>
 
-        {/* Grid de Contenido */}
         <div className="grid grid-cols-1 md:grid-cols-3 p-6 bg-gray-50/30 dark:bg-transparent gap-4 max-h-[70vh] overflow-y-auto">
           
           <CardContainer label="Nombre Programa">
@@ -72,8 +69,8 @@ const InformacionPrograma = ({ isOpen, onClose, program }: InformacionProgramaPr
           <ActionItem label="Asignaciones Periodo" />
 
           <CardContainer label="Apertura Programa">
-            <span className={`text-xs font-bold uppercase ${program.status === 'ACTIVO' ? 'text-success' : 'text-danger'}`}>
-              {program.status === 'ACTIVO' ? 'HABILITADO' : 'SUSPENDIDO'}
+            <span className={`text-xs font-bold uppercase ${program.status === 'ACTIVO' || program.status === 'APROBADO' ? 'text-success' : 'text-danger'}`}>
+              {program.status === 'ACTIVO' || program.status === 'APROBADO' ? 'HABILITADO' : 'SUSPENDIDO'}
             </span>
           </CardContainer>
 
@@ -81,18 +78,24 @@ const InformacionPrograma = ({ isOpen, onClose, program }: InformacionProgramaPr
             <span className="text-xs font-bold text-gray-700 uppercase dark:text-white">{program.nivel}</span>
           </CardContainer>
 
-          <ActionItem label="Estado Programa" />
+          <CardContainer label="Estado Programa">
+            <div className="flex items-center gap-2">
+              <span className="relative flex w-2 h-2">
+                <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-blue-500/40"></span>
+                <span className="relative inline-flex w-2 h-2 bg-blue-500 rounded-full"></span>
+              </span>
+              <span className="text-xs font-bold text-gray-700 uppercase dark:text-white">
+                {program.estado?.nombre || 'SIN ESTADO'}
+              </span>
+            </div>
+          </CardContainer>
 
-          {/* Tarjeta de Descripción */}
           <CardContainer label="Descripción Programa" isDescription>
             <p className={`text-[10px] font-semibold text-gray-700 uppercase dark:text-white ${isExpanded ? '' : 'line-clamp-2'}`}>
               {descriptionText}
             </p>
             {isLongDescription && (
-              <button 
-                onClick={() => setIsExpanded(!isExpanded)}
-                className="mt-1 text-[8px] font-bold text-primary uppercase hover:underline w-fit"
-              >
+              <button onClick={() => setIsExpanded(!isExpanded)} className="mt-1 text-[8px] font-bold text-primary uppercase hover:underline w-fit">
                 {isExpanded ? 'Ver menos' : 'Ver detalles'}
               </button>
             )}
@@ -105,7 +108,6 @@ const InformacionPrograma = ({ isOpen, onClose, program }: InformacionProgramaPr
           <ActionItem label="Procesos" />
         </div>
 
-        {/* Footer */}
         <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-gray-100/50 dark:bg-black/20 dark:border-white/5">
           <div className="flex items-center gap-2 px-3 py-1 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-coal-500">
             <i className="text-xs text-primary ki-outline ki-fingerprint"></i>

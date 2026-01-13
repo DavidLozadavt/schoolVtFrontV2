@@ -29,7 +29,6 @@ export const FormularioPrograma = ({
     if (isOpen) {
       cargarRecursos();
       if (programToEdit) {
-        // MODO EDICIÓN: Llenamos el formulario con los datos recibidos
         setFormData({
           name: programToEdit.name || '',
           codigo: programToEdit.codigo || '',

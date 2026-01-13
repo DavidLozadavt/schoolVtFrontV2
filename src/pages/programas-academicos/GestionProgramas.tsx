@@ -50,6 +50,7 @@ export const GestionProgramas = ({
       name: p.nombrePrograma,
       codigo: p.codigoPrograma,
       status: p.estado?.nombre || 'ACTIVO',
+      estado: p.estado,
       nivel: p.nivel?.nombreNivel || 'N/A',
       formacion: p.tipo_formacion?.nombreTipoFormacion || 'N/A',
       imageUrl: IMAGENES_POR_NIVEL[nivelKey] || IMAGENES_POR_NIVEL['DEFAULT'],
