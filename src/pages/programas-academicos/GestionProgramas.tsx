@@ -1,10 +1,11 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import axios from 'axios';
 import FormularioPrograma from './components/FormularioPrograma';
-import ConfirmarEliminar from './components/ConfirmarEliminar'; 
+import ConfirmarEliminar from './components/ConfirmarEliminar';
 import Toast from './components/Toast';
 import { Program } from './types';
 import InformacionPrograma from './components/InformacionPrograma';
+import MallaCurricular from './components/malla-curricular/MallaCurricular';
 
 const IMAGENES_POR_NIVEL: Record<string, string> = {
   'PREESCOLAR': 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=600',
@@ -18,19 +19,27 @@ const IMAGENES_POR_NIVEL: Record<string, string> = {
 };
 
 export const GestionProgramas = ({
-  onActionComplete = () => {} 
+  onActionComplete = () => { }
 }: {
   onActionComplete?: () => void;
 }) => {
 
+  const [isMallaOpen, setIsMallaOpen] = useState(false);
+  const [selectedMallaProgram, setSelectedMallaProgram] = useState<Program | null>(null);
+
+  const openMallaModal = (program: Program) => {
+    setSelectedMallaProgram(program);
+    setIsMallaOpen(true);
+  };
+
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [selectedInfoProgram, setSelectedInfoProgram] = useState<Program | null>(null);
-  
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
-  
+
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null); // Nueva sugerencia
@@ -38,7 +47,7 @@ export const GestionProgramas = ({
   const [activeIndex, setActiveIndex] = useState(0);
   const [programToEdit, setProgramToEdit] = useState<Program | null>(null);
   const [programToDelete, setProgramToDelete] = useState<Program | null>(null);
-  
+
   const carouselRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -149,10 +158,10 @@ export const GestionProgramas = ({
     setSelectedInfoProgram(program);
     setIsInfoOpen(true);
   };
-  
+
   return (
     <div className="relative flex flex-col w-full h-screen min-h-screen p-4 md:p-8 bg-[#f3f4f7] dark:bg-coal-500 font-sans overflow-hidden">
-      
+
       <div className="absolute inset-0 z-0 pointer-events-none opacity-40 dark:opacity-20">
         <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(#a1a1aa 0.5px, transparent 0.5px)', backgroundSize: '30px 30px' }}></div>
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-500/10 blur-[120px] rounded-full -mr-64 -mt-64"></div>
@@ -180,7 +189,7 @@ export const GestionProgramas = ({
 
         {/* Carousel Container */}
         <div className="relative w-full max-w-[1200px] mx-auto flex-grow flex items-center px-4 md:px-10 overflow-hidden">
-          
+
           {/* Condicional de Carga */}
           {loading ? (
             <div className="flex flex-col items-center justify-center w-full gap-4">
@@ -206,7 +215,7 @@ export const GestionProgramas = ({
                 {filteredPrograms.map((program) => (
                   <div key={program.id} className="flex-shrink-0 snap-center w-[220px] h-[310px] group [perspective:1000px]">
                     <div className="relative w-full h-full transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] shadow-xl rounded-[1.25rem]">
-                      
+
                       {/* FRONT CARD */}
                       <div className="absolute inset-0 [backface-visibility:hidden] rounded-[1.25rem] overflow-hidden border border-gray-400 dark:border-transparent">
                         <img src={program.imageUrl} alt="" className="absolute inset-0 object-cover w-full h-full" />
@@ -222,7 +231,11 @@ export const GestionProgramas = ({
                       <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)] bg-[#f8f9fa] dark:bg-coal-400 rounded-[1.25rem] p-5 flex flex-col border border-gray-400 dark:border-coal-300 shadow-inner">
                         <div className="flex justify-between mb-4">
                           <button title="Periodos abiertos" className="flex items-center justify-center w-8 h-8 text-gray-600 border border-transparent rounded-lg dark:text-blue-300 bg-blue-100/30 dark:bg-blue-500/10 hover:border-blue-500 hover:scale-105 active:scale-95"><i className="text-lg ki-outline ki-entrance-right"></i></button>
-                          <button title="Malla curricular" className="flex items-center justify-center w-8 h-8 text-gray-600 border border-transparent rounded-lg dark:text-blue-300 bg-blue-100/30 dark:bg-blue-500/10 hover:border-blue-500 hover:scale-105 active:scale-95"><i className="text-lg ki-outline ki-book-open"></i></button>
+
+                          <button title="Malla curricular"
+                            onClick={() => openMallaModal(program)}
+                            className="flex items-center justify-center w-8 h-8 text-gray-600 border border-transparent rounded-lg dark:text-blue-300 bg-blue-100/30 dark:bg-blue-500/10 hover:border-blue-500 hover:scale-105 active:scale-95"><i className="text-lg ki-outline ki-book-open"></i></button>
+
                           <button title="Configurar pagos" className="flex items-center justify-center w-8 h-8 text-gray-600 border border-transparent rounded-lg dark:text-blue-300 bg-blue-100/30 dark:bg-blue-500/10 hover:border-blue-500 hover:scale-105 active:scale-95"><i className="text-lg ki-outline ki-setting-2"></i></button>
                           <button title="Configurar documentos" className="flex items-center justify-center w-8 h-8 text-gray-600 border border-transparent rounded-lg dark:text-blue-300 bg-blue-100/30 dark:bg-blue-500/10 hover:border-blue-500 hover:scale-105 active:scale-95"><i className="text-lg ki-outline ki-files"></i></button>
                         </div>
@@ -234,25 +247,25 @@ export const GestionProgramas = ({
                         </div>
 
                         <div className="flex justify-between gap-2 pt-3 mt-auto border-t border-gray-100 dark:border-coal-200">
-                          <button 
+                          <button
                             onClick={() => openEditModal(program)}
-                            title="Actualizar" 
+                            title="Actualizar"
                             className="flex items-center justify-center flex-1 py-1.5 text-blue-500 transition-all border border-transparent bg-blue-50/50 dark:bg-blue-500/10 rounded-lg hover:border-blue-500 hover:scale-105"
                           >
                             <i className="ki-outline ki-arrows-loop"></i>
                           </button>
 
-                          <button 
+                          <button
                             onClick={() => openDeleteConfirm(program)}
-                            title="Eliminar" 
+                            title="Eliminar"
                             className="flex items-center justify-center flex-1 py-1.5 text-red-500 transition-all border border-transparent bg-red-50/50 dark:bg-red-500/10 rounded-lg hover:border-red-500 hover:scale-105"
                           >
                             <i className="ki-outline ki-trash"></i>
                           </button>
 
-                          <button title="Información" 
-                          onClick={() => handleOpenInfo(program)}
-                          className="flex items-center justify-center flex-1 py-1.5 text-blue-600 transition-all border border-transparent bg-blue-50/50 dark:bg-blue-500/10 rounded-lg hover:border-blue-600 hover:scale-105">
+                          <button title="Información"
+                            onClick={() => handleOpenInfo(program)}
+                            className="flex items-center justify-center flex-1 py-1.5 text-blue-600 transition-all border border-transparent bg-blue-50/50 dark:bg-blue-500/10 rounded-lg hover:border-blue-600 hover:scale-105">
                             <i className="ki-outline ki-eye"></i>
                           </button>
                         </div>
@@ -268,6 +281,12 @@ export const GestionProgramas = ({
         </div>
       </div>
 
+      <MallaCurricular
+        isOpen={isMallaOpen}
+        onClose={() => setIsMallaOpen(false)}
+        program={selectedMallaProgram}
+      />
+
       <FormularioPrograma
         isOpen={isModalOpen}
         onClose={() => { setIsModalOpen(false); setProgramToEdit(null); }}
@@ -276,7 +295,7 @@ export const GestionProgramas = ({
         programToEdit={programToEdit}
       />
 
-      <ConfirmarEliminar 
+      <ConfirmarEliminar
         isOpen={isConfirmOpen}
         onClose={() => { setIsConfirmOpen(false); setProgramToDelete(null); }}
         onConfirm={handleExecuteDelete}
@@ -288,13 +307,14 @@ export const GestionProgramas = ({
         isOpen={showToast}
         onClose={() => setShowToast(false)}
       />
-      
-      <InformacionPrograma 
+
+      <InformacionPrograma
         isOpen={isInfoOpen}
         onClose={() => setIsInfoOpen(false)}
         program={selectedInfoProgram}
       />
     </div>
+
   );
 };
 

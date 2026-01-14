@@ -49,3 +49,9 @@ export interface CatalogosData {
   tipos: CatalogoItem[];
   estados: CatalogoItem[];
 }
+
+export interface MallaCurricularProps {
+  isOpen: boolean;
+  onClose: () => void;
+  program: Program | null;
+}
