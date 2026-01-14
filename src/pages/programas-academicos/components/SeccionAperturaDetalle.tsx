@@ -33,7 +33,6 @@ const SeccionAperturaDetalle = ({ programId }: SeccionAperturaDetalleProps) => {
   };
 
   const InfoItem = ({ label, value, color = "text-gray-700" }: { label: string, value: any, color?: string }) => (
-    /* Se cambió border-gray-200 por border-gray-300 para mayor visibilidad en modo claro */
     <div className="flex flex-col p-2 border border-gray-300 rounded-lg shadow-sm bg-white/50 dark:bg-black/10 dark:border-white/5">
       <span className="text-[9px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">
         {label}
@@ -45,7 +44,7 @@ const SeccionAperturaDetalle = ({ programId }: SeccionAperturaDetalleProps) => {
   );
 
   return (
-    /* Ajustado el borde exterior dashed a border-gray-400 para que resalte sobre el fondo gris */
+    
     <div className={`flex flex-col transition-all duration-500 border border-dashed rounded-xl bg-gray-200 dark:bg-white/5 border-gray-400 dark:border-white/10 shadow-sm ${isExpanded ? 'md:col-span-3 h-auto' : 'h-[85px]'}`}>
       <div className="p-3 flex flex-col h-[85px]">
         <span className="text-[10px] font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest mb-auto">
@@ -62,7 +61,7 @@ const SeccionAperturaDetalle = ({ programId }: SeccionAperturaDetalleProps) => {
 
       {isExpanded && (
         <div className="px-4 pb-4 duration-300 animate-in slide-in-from-top-2">
-          {/* Divisor más oscuro en modo claro */}
+            
           <div className="pt-3 border-t border-gray-400 dark:border-white/10">
             {loading ? (
               <div className="flex items-center gap-2 py-2">
@@ -100,7 +99,7 @@ const SeccionAperturaDetalle = ({ programId }: SeccionAperturaDetalleProps) => {
                   <InfoItem label="Fin Matrícula" value={aperturaData.fechaFinalMatriculas} />
                 </div>
 
-                {/* Observación con borde reforzado */}
+                {/* Observación */}
                 <div className="p-3 border border-gray-300 rounded-lg bg-gray-50 dark:bg-black/5 dark:border-white/5">
                   <span className="text-[9px] font-bold text-gray-500 uppercase tracking-wider">Observación</span>
                   <p className="text-[11px] text-gray-600 dark:text-gray-300 italic mt-1 font-medium leading-tight">

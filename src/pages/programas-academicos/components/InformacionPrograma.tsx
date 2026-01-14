@@ -78,7 +78,6 @@ const InformacionPrograma = ({ isOpen, onClose, program }: InformacionProgramaPr
             <span className="text-[11px] font-black text-gray-700 uppercase dark:text-white">{program.formacion}</span>
           </CardContainer>
 
-          {/* --- SECCIONES DE ANCHO COMPLETO (md:col-span-3) --- */}
 
           {/* 1. Descripción Programa */}
           <div className="md:col-span-3">
