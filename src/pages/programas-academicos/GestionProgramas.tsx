@@ -106,7 +106,7 @@ export const GestionProgramas = ({
         onActionComplete();
       }
     } catch (error) {
-      alert("No se pudo eliminar el programa. Verifique dependencias.");
+      alert("No es posible eliminar este programa porque ya tiene períodos académicos asignados..");
     } finally {
       setProgramToDelete(null);
     }
