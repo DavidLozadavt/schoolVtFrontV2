@@ -907,7 +907,7 @@ const AppRoutingSetup = (): ReactElement => {
           <Route
             path="/estudiantes"
             element={
-              <ProtectedRoute requiredPermissions={['GESTION_USUARIO']}>
+              <ProtectedRoute requiredPermissions={['GESTION_ESTUDIANTE']}>
                 <EstudiantesPage />
               </ProtectedRoute>
             }

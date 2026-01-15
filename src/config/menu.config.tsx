@@ -639,24 +639,6 @@ export const MENU_SIDEBAR: TMenuConfig = [
       }
     ]
   },
-
-  {
-    title: 'Prueba Dashboard',
-    icon: 'book',
-    children: [
-      {
-        title: 'Profesor',
-        path: '/profesores',
-        requiredPermissions: ['GESTION_REPORTE_SUPERINTENDENCIA']
-      },
-      {
-        title:'Estudiantes',
-        path:'/estudiantes',
-        requiredPermissions: ['GESTION_REPORTE_SUPERINTENDENCIA']
-      } 
-    ]
-  },
-
   {
     title: 'Authentication',
     icon: 'security-user',

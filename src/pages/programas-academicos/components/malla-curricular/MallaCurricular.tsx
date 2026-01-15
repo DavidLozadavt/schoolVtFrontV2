@@ -192,7 +192,7 @@ export const MallaCurricular = ({
             onClick={onClose}
             className="w-full sm:w-auto px-10 py-2.5 font-black tracking-widest text-white uppercase transition-all rounded-lg bg-dark dark:bg-primary dark:text-white text-3xs hover:opacity-90 active:scale-95 shadow-lg"
           >
-            Finalizar
+            Cerrar 
           </button>
         </div>
 
