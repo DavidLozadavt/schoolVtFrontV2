@@ -213,7 +213,7 @@ export const GestionProgramas = ({
 
               <div ref={carouselRef} onScroll={handleScroll} className="flex items-center w-full gap-8 py-8 overflow-x-auto no-scrollbar snap-x snap-mandatory scroll-smooth">
                 {filteredPrograms.map((program) => (
-                  <div key={program.id} className="flex-shrink-0 snap-center w-[220px] h-[310px] group [perspective:1000px]">
+                  <div key={program.id} className="flex-shrink-0 snap-center w-[190px] h-[270px] group [perspective:1000px]">
                     <div className="relative w-full h-full transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] shadow-xl rounded-[1.25rem]">
 
                       {/* FRONT CARD */}

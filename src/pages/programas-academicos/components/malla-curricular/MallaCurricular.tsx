@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { MallaCurricularProps } from '../../types';
+import AsignarMateria from './AsignarMateria';
 
 export const MallaCurricular = ({
   isOpen,
@@ -7,7 +8,10 @@ export const MallaCurricular = ({
   program,
 }: MallaCurricularProps) => {
   const [niveles, setNiveles] = useState([{ id: 'A1', nombre: 'Transición Inicial' }]);
-  
+
+  const [isMateriaModalOpen, setIsMateriaModalOpen] = useState(false);
+  const [selectedNivelId, setSelectedNivelId] = useState('');
+
   // Simulación de datos para los selectores
   const [jornadas] = useState(['Única', 'Mañana', 'Tarde', 'Nocturna']);
   const [tiposPrograma] = useState(['ANUAL', 'SEMESTRAL', 'TRIMESTRAL']);
@@ -25,20 +29,25 @@ export const MallaCurricular = ({
     }
   };
 
+  const handleOpenMateria = (nivelId: string) => {
+    setSelectedNivelId(nivelId);
+    setIsMateriaModalOpen(true);
+  };
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
       <div className="relative w-full max-w-5xl bg-white dark:bg-coal-500 rounded-xl shadow-card dark:shadow-dark-default overflow-hidden border border-gray-300 dark:border-gray-dark-300 flex flex-col max-h-[95vh]">
-        
+
         {/* Header con Banner */}
         <div className="relative flex-shrink-0 w-full h-32 overflow-hidden md:h-40">
-          <img 
-            src={program.imageUrl} 
-            className="absolute inset-0 object-cover w-full h-full brightness-[0.35]" 
-            alt="Banner" 
+          <img
+            src={program.imageUrl}
+            className="absolute inset-0 object-cover w-full h-full brightness-[0.35]"
+            alt="Banner"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-coal-500 via-coal-500/20 to-transparent" />
-          
-          <button 
+
+          <button
             onClick={onClose}
             className="absolute z-10 flex items-center justify-center w-8 h-8 text-white transition-all border rounded-full top-4 right-4 bg-white/10 hover:bg-danger backdrop-blur-md border-white/30"
           >
@@ -58,12 +67,12 @@ export const MallaCurricular = ({
 
         {/* Área de Contenido */}
         <div className="flex-grow p-5 overflow-y-auto bg-gray-100 md:p-7 no-scrollbar dark:bg-coal-600">
-          
+
           {/* Toolbar de Gestión: Distribución mejorada de los 3 selectores */}
           <div className="flex flex-col items-stretch justify-between gap-4 p-4 mb-6 bg-white border border-gray-300 shadow-sm xl:flex-row dark:bg-coal-300 rounded-xl dark:border-gray-dark-100">
-            
+
             <div className="grid flex-grow grid-cols-1 gap-4 sm:grid-cols-3 lg:gap-2">
-              
+
               {/* 1. Periodo Lectivo */}
               <div className="flex items-center gap-3 px-2">
                 <div className="flex items-center justify-center flex-shrink-0 rounded-lg w-9 h-9 bg-primary-light dark:bg-primary-clarity text-primary">
@@ -107,16 +116,16 @@ export const MallaCurricular = ({
               </div>
             </div>
 
-            {/* Controles de Acción (Alineados a la derecha en pantallas grandes) */}
+            {/* Controles de Acción  */}
             <div className="flex items-center justify-center gap-2 pt-4 border-t border-gray-200 xl:pt-0 xl:border-t-0 xl:pl-4 xl:border-l dark:border-gray-dark-300">
-              <button 
+              <button
                 onClick={quitarNivel}
                 className="flex items-center justify-center w-10 h-10 transition-all border border-gray-300 rounded-lg bg-gray-50 dark:bg-coal-400 dark:border-gray-dark-300 text-danger hover:bg-danger hover:text-white group"
                 title="Quitar nivel"
               >
                 <i className="text-xl transition-transform ki-outline ki-minus group-active:scale-75"></i>
               </button>
-              <button 
+              <button
                 onClick={agregarNivel}
                 className="flex items-center justify-center w-10 h-10 text-white transition-all rounded-lg bg-primary shadow-primary hover:bg-primary-active group"
                 title="Agregar nivel"
@@ -139,25 +148,27 @@ export const MallaCurricular = ({
                     <button className="flex items-center justify-center text-gray-500 bg-gray-100 rounded-md w-7 h-7 dark:bg-coal-200 dark:text-gray-400 hover:text-danger"><i className="text-xs ki-outline ki-trash"></i></button>
                   </div>
                 </div>
-                
+
                 <div className="space-y-4">
                   <h4 className="pl-3 text-xs font-black tracking-tight text-gray-800 uppercase border-l-3 dark:text-white border-primary">
                     {nivel.nombre}
                   </h4>
                   <div className="p-3 border border-gray-300 border-dashed rounded-lg bg-gray-50 dark:bg-coal-400 dark:border-gray-dark-300">
-                 
+
                     <p className="italic font-medium text-gray-600 text-2xs dark:text-gray-500">No se han registrado datos para este nivel.</p>
                   </div>
                 </div>
 
-                <button className="w-full py-2.5 mt-5 font-bold text-gray-500 uppercase transition-all border border-gray-400 border-dashed rounded-lg dark:border-gray-dark-300 dark:text-gray-800 hover:border-primary hover:text-white hover:bg-blue-500 text-4xs ">
-                  <i className="mr-1.5 ki-outline ki-plus"></i> 
+                <button
+                  onClick={() => handleOpenMateria(nivel.id)}
+                  className="w-full py-2.5 mt-5 font-bold text-gray-500 uppercase transition-all border border-gray-400 border-dashed rounded-lg dark:border-gray-dark-300 dark:text-gray-800 hover:border-primary hover:text-white hover:bg-blue-500 text-4xs ">
+                  <i className="mr-1.5 ki-outline ki-plus"></i>
                 </button>
               </div>
             ))}
 
             {/* Botón rápido para añadir nivel al final de la lista */}
-            <button 
+            <button
               onClick={agregarNivel}
               className="h-full min-h-[200px] flex flex-col items-center justify-center border-2 border-dashed border-gray-400 dark:border-gray-dark-300 rounded-xl hover:bg-white dark:hover:bg-coal-300 transition-all group hover:border-primary"
             >
@@ -177,8 +188,8 @@ export const MallaCurricular = ({
               Cambios sincronizados automáticamente con el programa.
             </p>
           </div>
-          <button 
-            onClick={onClose} 
+          <button
+            onClick={onClose}
             className="w-full sm:w-auto px-10 py-2.5 font-black tracking-widest text-white uppercase transition-all rounded-lg bg-dark dark:bg-primary dark:text-white text-3xs hover:opacity-90 active:scale-95 shadow-lg"
           >
             Finalizar
@@ -186,6 +197,15 @@ export const MallaCurricular = ({
         </div>
 
       </div>
+
+      <AsignarMateria
+        isOpen={isMateriaModalOpen}
+        onClose={() => setIsMateriaModalOpen(false)}
+        nivelId={selectedNivelId}
+      />
+
+
+
     </div>
   );
 };
