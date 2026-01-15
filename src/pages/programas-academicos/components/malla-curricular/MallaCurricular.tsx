@@ -189,11 +189,12 @@ export const MallaCurricular = ({
             </p>
           </div>
           <button
-            onClick={onClose}
-            className="w-full sm:w-auto px-10 py-2.5 font-black tracking-widest text-white uppercase transition-all rounded-lg bg-dark dark:bg-primary dark:text-white text-3xs hover:opacity-90 active:scale-95 shadow-lg"
-          >
-            Cerrar 
-          </button>
+  onClick={onClose}
+  className="w-full sm:w-auto px-10 py-2.5 bg-primary dark:bg-primary text-white rounded-lg text-3xs font-black uppercase tracking-widest hover:bg-primary-active active:scale-95 transition-all shadow-lg"
+>
+  Cerrar
+</button>
+
         </div>
 
       </div>
