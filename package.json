@@ -23,6 +23,7 @@
     "@firebase/firestore": "^4.7.3",
     "@formatjs/intl-pluralrules": "^5.2.15",
     "@formatjs/intl-relativetimeformat": "^11.2.15",
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@mui/base": "5.0.0-beta.40",
