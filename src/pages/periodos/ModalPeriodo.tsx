@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Modal, ModalContent, ModalBody, ModalHeader, ModalTitle } from '@/components/modal';
 import { KeenIcon } from '@/components/keenicons';
+import { useSnackbar } from 'notistack';
 
 export type PeriodoInterface = {
   id?: string | number;
-  nombre?: string;
+  nombrePeriodo: string;
   fechaInicio?: string;
   fechaFin?: string;
 };
@@ -14,18 +15,21 @@ interface ModalProps {
   open: boolean;
   periodo?: PeriodoInterface;
   onClose: () => void;
-  onSave?: (saved?: PeriodoInterface) => void;
+  onSave?: () => void; // 🔥 solo notifica
 }
 
 const ModalPeriodo = ({ open, periodo, onClose, onSave }: ModalProps) => {
-  const [nombre, setNombre] = useState(periodo?.nombre || '');
-  const [fechaInicio, setFechaInicio] = useState(periodo?.fechaInicio || '');
-  const [fechaFin, setFechaFin] = useState(periodo?.fechaFin || '');
+  const { enqueueSnackbar } = useSnackbar();
+
+  const [nombre, setNombre] = useState('');
+  const [fechaInicio, setFechaInicio] = useState('');
+  const [fechaFin, setFechaFin] = useState('');
   const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState<{ nombre?: string }>({});
 
   useEffect(() => {
     if (periodo) {
-      setNombre(periodo.nombre || '');
+      setNombre(periodo.nombrePeriodo || '');
       setFechaInicio(periodo.fechaInicio || '');
       setFechaFin(periodo.fechaFin || '');
     } else {
@@ -33,33 +37,50 @@ const ModalPeriodo = ({ open, periodo, onClose, onSave }: ModalProps) => {
       setFechaInicio('');
       setFechaFin('');
     }
+    setErrors({});
   }, [periodo, open]);
 
+  const validate = () => {
+    const newErrors: { nombre?: string } = {};
+    if (!nombre.trim()) newErrors.nombre = 'Nombre del periodo requerido';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSave = async () => {
+    if (!validate()) return;
+
     setSaving(true);
     try {
-      const saved: PeriodoInterface = {
-        id: periodo?.id ?? Date.now().toString(),
-        nombre,
-        fechaInicio,
-        fechaFin
+      const payload = {
+        nombrePeriodo: nombre.trim(),
+        fechaInicial: fechaInicio || null, // 🔥 backend
+        fechaFinal: fechaFin || null, // 🔥 backend
+        idEmpresa: 1 // 🔥 temporal
       };
-      if (onSave) onSave(saved);
-      // limpiar campos localmente
-      setNombre('');
-      setFechaInicio('');
-      setFechaFin('');
-    } catch (error) {
-      console.error('Error guardando periodo (local):', error);
+
+      if (periodo?.id) {
+        await axios.put(`periodos/${periodo.id}`, payload);
+        enqueueSnackbar('Periodo actualizado correctamente.', { variant: 'success' });
+      } else {
+        await axios.post('periodos', payload);
+        enqueueSnackbar('Periodo creado correctamente.', { variant: 'success' });
+      }
+
+      if (onSave) {
+        onSave();
+      }
+    } catch (error: any) {
+      console.error(error);
+      const msg = error?.response?.data?.message || 'Error al guardar el periodo';
+      enqueueSnackbar(msg, { variant: 'error' });
     } finally {
       setSaving(false);
     }
   };
 
   const handleClose = () => {
-    setNombre('');
-    setFechaInicio('');
-    setFechaFin('');
+    setErrors({});
     onClose();
   };
 
@@ -68,41 +89,37 @@ const ModalPeriodo = ({ open, periodo, onClose, onSave }: ModalProps) => {
       <ModalContent className="max-w-[640px] top-[5%] p-4">
         <ModalHeader>
           <ModalTitle>{periodo?.id ? 'Editar periodo' : 'Crear periodo'}</ModalTitle>
-          <button
-            className="btn btn-sm btn-icon btn-light btn-clear shrink-0"
-            onClick={handleClose}
-          >
+          <button className="btn btn-sm btn-icon btn-light btn-clear" onClick={handleClose}>
             <KeenIcon icon="cross" />
           </button>
         </ModalHeader>
 
         <ModalBody className="grid gap-5 px-0 py-5">
           <div className="w-[calc(100%-2rem)] mx-auto">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nombre periodo</label>
+            <label className="block text-sm font-medium mb-1">Nombre periodo</label>
             <input
-              className="input p-2 border border-gray-300 rounded-md w-full"
-              placeholder="Ingrese Nombre periodo"
-              type="text"
+              className={`input p-2 w-full ${errors.nombre ? 'border-red-500' : 'border-gray-300'}`}
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
             />
+            {errors.nombre && <p className="text-sm text-red-500 mt-1">{errors.nombre}</p>}
           </div>
 
           <div className="grid grid-cols-2 gap-4 w-[calc(100%-2rem)] mx-auto">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Inicio</label>
+              <label className="block text-sm font-medium mb-1">Inicio</label>
               <input
-                className="input p-2 border border-gray-300 rounded-md w-full"
                 type="date"
+                className="input p-2 w-full"
                 value={fechaInicio}
                 onChange={(e) => setFechaInicio(e.target.value)}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Fin</label>
+              <label className="block text-sm font-medium mb-1">Fin</label>
               <input
-                className="input p-2 border border-gray-300 rounded-md w-full"
                 type="date"
+                className="input p-2 w-full"
                 value={fechaFin}
                 onChange={(e) => setFechaFin(e.target.value)}
               />
@@ -113,7 +130,7 @@ const ModalPeriodo = ({ open, periodo, onClose, onSave }: ModalProps) => {
             <button className="btn btn-secondary btn-sm" onClick={handleClose} disabled={saving}>
               CANCELAR
             </button>
-            <button onClick={handleSave} className="btn btn-primary btn-sm" disabled={saving}>
+            <button className="btn btn-primary btn-sm" onClick={handleSave} disabled={saving}>
               {saving ? 'Guardando...' : 'ACEPTAR'}
             </button>
           </div>

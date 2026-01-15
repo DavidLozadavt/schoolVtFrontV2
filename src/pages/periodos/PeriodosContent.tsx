@@ -1,39 +1,67 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { DataGrid } from '@/components';
 import { KeenIcon } from '@/components/keenicons';
 import ModalPeriodo, { PeriodoInterface } from './ModalPeriodo';
+import axios from 'axios';
+import { useConfirm } from '@/hooks';
+import { enqueueSnackbar } from 'notistack';
 
-type Periodo = {
+interface Periodo {
   id: string;
-  nombre: string;
-  fechaInicio: string;
-  fechaFin: string;
-};
+  nombrePeriodo: string;
+  fechaInicial: string;
+  fechaFinal: string;
+}
 
-const initialPeriodos: Periodo[] = [
-  { id: '1', nombre: '2024-II', fechaInicio: '2024-07-02', fechaFin: '2025-07-01' },
-  { id: '2', nombre: '2023-II', fechaInicio: '2023-07-02', fechaFin: '2024-07-01' },
-  { id: '3', nombre: '2022-II', fechaInicio: '2022-07-02', fechaFin: '2023-07-01' }
-];
+interface PeriodosProps {
+  reload?: boolean;
+}
 
-const PeriodosPage: React.FC = () => {
-  const [periodos, setPeriodos] = useState<Periodo[]>(initialPeriodos);
-  const [searchTerm, setSearchTerm] = useState<string>('');
+const PeriodosContent: React.FC<PeriodosProps> = ({ reload = false }) => {
+  const storageFilterId = 'periodo-filter';
+  const [periodos, setPeriodos] = useState<Periodo[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>(() => {
+    return localStorage.getItem(storageFilterId) || '';
+  });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPeriodo, setSelectedPeriodo] = useState<PeriodoInterface | undefined>(undefined);
+  const [loading, setLoading] = useState(false);
+  const { confirmAction } = useConfirm();
+  const [error, setError] = useState<string>('');
 
-  const openNew = () => {
-    setSelectedPeriodo(undefined);
-    setIsModalOpen(true);
+  useEffect(() => {
+    fetchPeriodos();
+  }, [reload]);
+
+  useEffect(() => {
+    localStorage.setItem(storageFilterId, searchTerm);
+  }, [searchTerm]);
+
+  const deletePeriodo = (id: string) => {
+    confirmAction('¿Eliminar este periodo permanentemente?', async () => {
+      try {
+        await axios.delete(`periodos/${id}`);
+        fetchPeriodos();
+        enqueueSnackbar('Periodo eliminado correctamente', {
+          variant: 'success'
+        });
+      } catch (err) {
+        console.error('❌ Error eliminando periodo', err);
+
+        enqueueSnackbar('Error al eliminar el periodo', {
+          variant: 'error'
+        });
+      }
+    });
   };
 
   const openEdit = (p: Periodo) => {
     setSelectedPeriodo({
       id: p.id,
-      nombre: p.nombre,
-      fechaInicio: p.fechaInicio,
-      fechaFin: p.fechaFin
+      nombrePeriodo: p.nombrePeriodo,
+      fechaInicio: p.fechaInicial,
+      fechaFin: p.fechaFinal
     });
     setIsModalOpen(true);
   };
@@ -43,29 +71,10 @@ const PeriodosPage: React.FC = () => {
     setSelectedPeriodo(undefined);
   };
 
-  const handleAfterSave = (saved?: PeriodoInterface) => {
-    if (!saved) {
-      setIsModalOpen(false);
-      return;
-    }
-    // si viene con id existente actualizamos, si no lo agregamos
-    const id = saved.id?.toString() || Date.now().toString();
-    const nuevo: Periodo = {
-      id,
-      nombre: saved.nombre || '',
-      fechaInicio: saved.fechaInicio || '',
-      fechaFin: saved.fechaFin || ''
-    };
-    setPeriodos((prev) => {
-      const exists = prev.some((x) => x.id.toString() === id);
-      if (exists) {
-        return prev.map((x) => (x.id.toString() === id ? nuevo : x));
-      } else {
-        return [nuevo, ...prev];
-      }
-    });
+  const handleAfterSave = async () => {
     setIsModalOpen(false);
     setSelectedPeriodo(undefined);
+    fetchPeriodos();
   };
 
   const columns = useMemo<ColumnDef<Periodo>[]>(
@@ -76,16 +85,19 @@ const PeriodosPage: React.FC = () => {
         header: () => 'Código',
         enableSorting: true,
         cell: (info) => <span className="text-gray-700">{info.row.original.id}</span>,
-        meta: { className: 'w-[100px]', cellClassName: 'text-gray-700 font-normal' }
+        meta: {
+          className: 'w-[100px]',
+          cellClassName: 'text-gray-700 font-normal'
+        }
       },
       {
-        accessorFn: (row) => row.nombre,
+        accessorFn: (row) => row.nombrePeriodo,
         id: 'nombre',
         header: () => 'Nombre periodo',
         enableSorting: true,
         cell: (info) => (
           <span className="leading-none font-medium text-sm text-gray-900">
-            {info.row.original.nombre}
+            {info.row.original.nombrePeriodo}
           </span>
         ),
         meta: {
@@ -94,13 +106,13 @@ const PeriodosPage: React.FC = () => {
         }
       },
       {
-        accessorFn: (row) => row.fechaInicio,
+        accessorFn: (row) => row.fechaInicial,
         id: 'fechaInicio',
         header: () => 'Fecha Inicial',
         enableSorting: true,
         cell: (info) => (
           <span className="leading-none font-medium text-sm text-gray-900">
-            {info.row.original.fechaInicio}
+            {info.row.original.fechaInicial}
           </span>
         ),
         meta: {
@@ -109,13 +121,13 @@ const PeriodosPage: React.FC = () => {
         }
       },
       {
-        accessorFn: (row) => row.fechaFin,
+        accessorFn: (row) => row.fechaFinal,
         id: 'fechaFin',
         header: () => 'Fecha Final',
         enableSorting: true,
         cell: (info) => (
           <span className="leading-none font-medium text-sm text-gray-900">
-            {info.row.original.fechaFin}
+            {info.row.original.fechaFinal}
           </span>
         ),
         meta: {
@@ -145,9 +157,7 @@ const PeriodosPage: React.FC = () => {
           <button
             className="btn btn-sm btn-icon btn-clear btn-light"
             onClick={() => {
-              if (window.confirm(`¿Eliminar periodo ${row.original.nombre}?`)) {
-                setPeriodos((prev) => prev.filter((p) => p.id !== row.original.id));
-              }
+              deletePeriodo(row.original.id);
             }}
           >
             <KeenIcon icon="trash" />
@@ -159,22 +169,37 @@ const PeriodosPage: React.FC = () => {
     []
   );
 
+  const fetchPeriodos = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get('periodos');
+      setPeriodos(response.data);
+    } catch (error) {
+      setError('Error al cargar los periodos');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const filteredData = useMemo(() => {
     if (!searchTerm) return periodos;
-    const lower = searchTerm.toLowerCase();
-    return periodos.filter(
-      (p) =>
-        p.nombre.toLowerCase().includes(lower) ||
-        p.fechaInicio.toLowerCase().includes(lower) ||
-        p.fechaFin.toLowerCase().includes(lower) ||
-        p.id.toLowerCase().includes(lower)
-    );
+
+    return periodos.filter((p) => p.nombrePeriodo.toLowerCase().includes(searchTerm.toLowerCase()));
   }, [searchTerm, periodos]);
+
+  if (loading) {
+    return <div className="text-center py-10 text-gray-500">Cargando periodos...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center py-10 text-red-500">{error}</div>;
+  }
 
   return (
     <div className="card card-grid min-w-full">
       <div className="card-header flex-wrap py-5">
         <h3 className="card-title">Periodos</h3>
+
         <div className="flex gap-6 items-center">
           <div className="relative">
             <KeenIcon
@@ -188,10 +213,6 @@ const PeriodosPage: React.FC = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-          </div>
-
-          <div>
-
           </div>
         </div>
       </div>
@@ -215,4 +236,4 @@ const PeriodosPage: React.FC = () => {
   );
 };
 
-export default PeriodosPage;
+export default PeriodosContent;

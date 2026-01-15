@@ -19,7 +19,7 @@ const PeriodosPage = () => {
   const handleModalOpen = () => {
     setModalOpen(true);
   };
-  
+
   const handleModalClose = () => {
     setModalOpen(false);
   };
@@ -48,7 +48,7 @@ const PeriodosPage = () => {
       )}
       <Container>
         <ModalPeriodo open={modalOpen} onClose={handleModalClose} onSave={handleAfterSave} />
-        <PeriodosContent/>
+        <PeriodosContent reload={reloadContent} />
       </Container>
     </Fragment>
   );
