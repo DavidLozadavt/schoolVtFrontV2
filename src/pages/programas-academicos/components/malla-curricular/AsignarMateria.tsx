@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
 
-interface AsignarMateriaProps {
-  isOpen: boolean;
-  onClose: () => void;
-  nivelId: string;
-}
+import { AsignarMateriaProps } from '../../types';
+
 
 const AsignarMateria: React.FC<AsignarMateriaProps> = ({ isOpen, onClose, nivelId }) => {
   const [showForm, setShowForm] = useState(false);

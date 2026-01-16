@@ -1,4 +1,4 @@
-// Estructura principal del Programa para el Carrusel y UI
+
 export interface Program {
   id: number;
   name: string;
@@ -54,4 +54,10 @@ export interface MallaCurricularProps {
   isOpen: boolean;
   onClose: () => void;
   program: Program | null;
+}
+
+export interface AsignarMateriaProps {
+  isOpen: boolean;
+  onClose: () => void;
+  nivelId: string;
 }
