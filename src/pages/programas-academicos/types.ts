@@ -61,3 +61,31 @@ export interface AsignarMateriaProps {
   onClose: () => void;
   nivelId: string;
 }
+
+export interface RecursoItem {
+  id: number;
+  nombre: string;
+}
+
+export interface MallaDataResponse {
+  status: string;
+  data: {
+    detalle: {
+      id: number;
+      idPeriodo: number;
+      idSede: number;
+      jornadas: RecursoItem[];
+      programa: {
+        id: number;
+        nombrePrograma: string;
+        tipo_grado: RecursoItem;
+      };
+      periodo: RecursoItem;
+    };
+    recursos: {
+      periodos: RecursoItem[];
+      tipos_grado: RecursoItem[];
+      jornadas_disponibles: RecursoItem[];
+    };
+  };
+}
