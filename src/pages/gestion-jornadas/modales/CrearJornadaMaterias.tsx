@@ -156,7 +156,7 @@ const CrearJornadaMaterias: React.FC<CrearJornadaMateriasProps> = ({
               value={descripcion}
               onChange={(e) => setDescripcion(e.target.value)}
               rows={2}
-              className="input w-full p-2 border rounded-md resize-none"
+              className="textarea w-full p-2 border rounded-md resize-none"
             />
           </div>
 

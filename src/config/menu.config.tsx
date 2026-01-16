@@ -25,6 +25,11 @@ export const MENU_SIDEBAR: TMenuConfig = [
         title: 'Infraestructura',
         path: '/gestion-academica/configuracion/infraestructura',
         requiredPermissions: ['GESTION_USUARIO']
+      },
+      {
+        title: 'Sedes School',
+        path: '/gestion-academica/configuracion/sedes-school',
+        requiredPermissions: ['GESTION_USUARIO']
       }
     ]
   },
@@ -650,10 +655,10 @@ export const MENU_SIDEBAR: TMenuConfig = [
         requiredPermissions: ['GESTION_REPORTE_SUPERINTENDENCIA']
       },
       {
-        title:'Estudiantes',
-        path:'/estudiantes',
+        title: 'Estudiantes',
+        path: '/estudiantes',
         requiredPermissions: ['GESTION_REPORTE_SUPERINTENDENCIA']
-      } 
+      }
     ]
   },
 
