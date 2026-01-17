@@ -10,7 +10,7 @@ export const MallaCurricular = ({ isOpen, onClose, program }: MallaCurricularPro
 
   // Catálogos de la API
   const [recursos, setRecursos] = useState<{
-    periodos: RecursoItem[];
+    periodos: any[];
     tipos_grado: any[];
     jornadas_disponibles: any[];
   } | null>(null);
@@ -19,6 +19,9 @@ export const MallaCurricular = ({ isOpen, onClose, program }: MallaCurricularPro
   const [selectedPeriodo, setSelectedPeriodo] = useState<number | string>('');
   const [selectedTipoGrado, setSelectedTipoGrado] = useState<number | string>('');
   const [selectedJornada, setSelectedJornada] = useState<number | string>('');
+  
+  // Estado para bloquear el select de grado
+  const [isGradoDisabled, setIsGradoDisabled] = useState(false);
 
   // --- ESTADOS PARA MODAL ASIGNAR MATERIA ---
   const [isMateriaModalOpen, setIsMateriaModalOpen] = useState(false);
@@ -38,6 +41,12 @@ export const MallaCurricular = ({ isOpen, onClose, program }: MallaCurricularPro
 
             const gradoId = data.idTipoGradoAsignado || data.detalle.programa.idTipoGrado || '';
             setSelectedTipoGrado(gradoId);
+            
+            if (data.idTipoGradoAsignado) {
+              setIsGradoDisabled(true);
+            } else {
+              setIsGradoDisabled(false);
+            }
 
             if (data.detalle.jornadas?.length > 0) {
               setSelectedJornada(data.detalle.jornadas[0].id);
@@ -86,6 +95,9 @@ export const MallaCurricular = ({ isOpen, onClose, program }: MallaCurricularPro
 
   const nombreGradoActual = recursos?.tipos_grado.find(t => t.id == selectedTipoGrado)?.nombre || 'SIN ASIGNAR';
 
+  // Clase común para los selectores en modo oscuro
+  const selectDarkClass = "p-0 font-extrabold bg-transparent border-none focus:ring-0 text-2sm dark:text-white dark:[color-scheme:dark]";
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
       <div className="relative w-full max-w-5xl bg-white dark:bg-coal-500 rounded-xl shadow-card flex flex-col max-h-[95vh] overflow-hidden border border-gray-300 dark:border-gray-dark-300">
@@ -106,8 +118,7 @@ export const MallaCurricular = ({ isOpen, onClose, program }: MallaCurricularPro
           </button>
           <div className="absolute text-white bottom-4 left-6">
             <h2 className="text-1.5xl font-bold uppercase">{program.name}</h2>
-            {/* AJUSTE: Información de Tipo de Grado e ID Programa */}
-            <div className="italic font-bold text-gray-300 uppercase text-2xs">
+            <div className="italic font-bold text-gray-300 uppercase dark:text-gray-200 text-2xs">
               <p>Gestión de Malla Curricular</p>
               <p>Grado: {nombreGradoActual}</p>
               <p>ID : {program.id}</p>
@@ -127,25 +138,33 @@ export const MallaCurricular = ({ isOpen, onClose, program }: MallaCurricularPro
                   <select
                     value={selectedPeriodo}
                     onChange={(e) => setSelectedPeriodo(e.target.value)}
-                    className="p-0 font-extrabold text-gray-800 bg-transparent border-none focus:ring-0 text-2sm dark:text-white"
+                    className={`text-gray-800 ${selectDarkClass}`}
                   >
-                    <option value="">SELECCIONE...</option>
-                    {recursos?.periodos.map(p => <option key={p.id} value={p.id}>{p.nombre}</option>)}
+                    <option value="" className="dark:bg-coal-500">SELECCIONE...</option>
+                    {recursos?.periodos.map(p => (
+                      <option key={p.id} value={p.id} className="dark:bg-coal-500 dark:text-white">
+                        {selectedPeriodo == p.id ? p.nombre : `${p.nombre} (${p.fechaInicial} a ${p.fechaFinal})`}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
 
-              {/* Select Jornada ) */}
+              {/* Select Jornada */}
               <div className="flex items-center gap-3 px-2 border-gray-200 sm:border-l dark:border-gray-dark-300">
                 <div className="flex flex-col w-full">
                   <label className="font-bold text-gray-500 uppercase text-3xs">Jornada</label>
                   <select
                     value={selectedJornada}
                     onChange={(e) => setSelectedJornada(e.target.value)}
-                    className="p-0 font-extrabold text-gray-800 bg-transparent border-none focus:ring-0 text-2sm dark:text-white"
+                    className={`text-gray-800 ${selectDarkClass}`}
                   >
-                    <option value="">SELECCIONE...</option>
-                    {recursos?.jornadas_disponibles.map(j => <option key={j.id} value={j.id}>{j.nombre}</option>)}
+                    <option value="" className="dark:bg-gray-500">SELECCIONE...</option>
+                    {recursos?.jornadas_disponibles.map(j => (
+                      <option key={j.id} value={j.id} className="dark:bg-coal-500 dark:text-white">
+                        {selectedJornada == j.id ? j.nombre : `${j.nombre} - ${j.diaSemana} (${j.horaInicial} a ${j.horaFinal})`}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -157,16 +176,19 @@ export const MallaCurricular = ({ isOpen, onClose, program }: MallaCurricularPro
                   <select
                     value={selectedTipoGrado}
                     onChange={(e) => setSelectedTipoGrado(e.target.value)}
-                    className="p-0 font-extrabold uppercase bg-transparent border-none text-primary focus:ring-0 text-2sm"
+                    disabled={isGradoDisabled}
+                    className={`${selectDarkClass} uppercase ${isGradoDisabled ? 'text-gray-400 cursor-not-allowed opacity-70' : 'text-primary'}`}
                   >
-                    <option value="">SELECCIONE...</option>
-                    {recursos?.tipos_grado.map(t => <option key={t.id} value={t.id}>{t.nombre}</option>)}
+                    <option value="" className="dark:bg-coal-500">SELECCIONE...</option>
+                    {recursos?.tipos_grado.map(t => (
+                      <option key={t.id} value={t.id} className="dark:bg-coal-500 dark:text-white">{t.nombre}</option>
+                    ))}
                   </select>
                 </div>
               </div>
             </div>
 
-            {/* Acciones para Niveles */}
+            {/* Acciones para grados */}
             <div className="flex items-center justify-center gap-2 pt-4 border-t border-gray-200 xl:pt-0 xl:border-t-0 xl:pl-4 xl:border-l dark:border-gray-dark-300">
               <button onClick={quitarNivel} className="flex items-center justify-center w-10 h-10 transition-all border border-gray-300 rounded-lg text-danger hover:bg-danger hover:text-white">
                 <i className="text-xl ki-outline ki-minus"></i>
@@ -183,7 +205,9 @@ export const MallaCurricular = ({ isOpen, onClose, program }: MallaCurricularPro
               <div key={nivel.id} className="p-5 transition-colors bg-white border border-gray-400 shadow-sm dark:bg-coal-300 rounded-xl animate-fade-in-up hover:border-primary">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-2xl italic font-black text-primary opacity-30">{nivel.id}</span>
-                  <span className="text-[10px] font-black text-primary bg-primary/10 px-2 py-0.5 rounded uppercase">{nivel.jornadaId ? recursos?.jornadas_disponibles.find(j => j.id == nivel.jornadaId)?.nombre : ''}</span>
+                  <span className="text-[10px] font-black text-primary bg-primary/10 px-2 py-0.5 rounded uppercase">
+                    {nivel.jornadaId ? recursos?.jornadas_disponibles.find(j => j.id == nivel.jornadaId)?.nombre : ''}
+                  </span>
                 </div>
                 <h4 className="mb-4 text-xs font-black text-gray-800 uppercase dark:text-white">
                   {nivel.nombre}
@@ -220,7 +244,6 @@ export const MallaCurricular = ({ isOpen, onClose, program }: MallaCurricularPro
         </div>
       </div>
 
-      {/* Renderizado de Materias */}
       <AsignarMateria
         isOpen={isMateriaModalOpen}
         onClose={() => setIsMateriaModalOpen(false)}
