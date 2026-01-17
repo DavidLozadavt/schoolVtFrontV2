@@ -65,23 +65,44 @@ export interface AsignarMateriaProps {
 export interface RecursoItem {
   id: number;
   nombre: string;
+  fechaInicial?: string;
+  fechaFinal?: string;
+}
+
+export interface JornadaItem {
+  id: number;
+  nombreJornada: string; 
+  pivot?: {
+    idAsignacion: number;
+    idJornada: number;
+  };
+}
+
+export interface DetalleAsignacion {
+  id: number;
+  idPeriodo: number;
+  idSede: number;
+  jornadas: JornadaItem[]; 
+  programa: {
+    id: number;
+    nombrePrograma: string;
+    idTipoGrado: number;
+    tipo_grado: RecursoItem | null;
+  };
+  periodo: {
+    id: number;
+    nombrePeriodo: string;
+  };
+  sede: {
+    id: number;
+    nombre: string;
+  };
 }
 
 export interface MallaDataResponse {
   status: string;
   data: {
-    detalle: {
-      id: number;
-      idPeriodo: number;
-      idSede: number;
-      jornadas: RecursoItem[];
-      programa: {
-        id: number;
-        nombrePrograma: string;
-        tipo_grado: RecursoItem;
-      };
-      periodo: RecursoItem;
-    };
+    detalle: DetalleAsignacion;
     recursos: {
       periodos: RecursoItem[];
       tipos_grado: RecursoItem[];
