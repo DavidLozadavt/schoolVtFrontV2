@@ -27,8 +27,8 @@ export const MENU_SIDEBAR: TMenuConfig = [
         requiredPermissions: ['GESTION_USUARIO']
       },
       {
-        title: 'Sedes School',
-        path: '/gestion-academica/configuracion/sedes-school',
+        title: 'Sedes Institucionales',
+        path: '/gestion-academica/configuracion/sedes-institucionales',
         requiredPermissions: ['GESTION_USUARIO']
       }
     ]

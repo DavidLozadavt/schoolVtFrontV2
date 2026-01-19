@@ -6,13 +6,13 @@ import Swal from 'sweetalert2';
 import { Container, KeenIcon } from '@/components';
 import { Toolbar, ToolbarDescription, ToolbarHeading, ToolbarPageTitle } from '@/partials/toolbar';
 
-import ModalCrearSedeSchool from './modales/ModalCrearSedeSchool';
-import ModalActualizarSedeSchool from './modales/ActualizarSedeSchool';
+import ModalCrearSedeInstitucional from './modales/ModalCrearSedeInstitucional';
+import ModalActualizarSedeInstitucional from './modales/ActualizarSedeInstitucional';
 import InfraestructurasSede from './InfraestructurasPage';
 
-interface SedeSchool {
+interface SedeInstitucional {
   id: number;
-  nombreSede: string;
+  nombre: string;
   direccion: string;
   telefono?: string;
   descripcion?: string;
@@ -25,8 +25,8 @@ interface SedeSchool {
 
 const ITEMS_PER_PAGE = 6;
 
-const SedesSchoolPage: React.FC = () => {
-  const [sedes, setSedes] = useState<SedeSchool[]>([]);
+const SedesInstitucionalePage: React.FC = () => {
+  const [sedes, setSedes] = useState<SedeInstitucional[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -44,7 +44,7 @@ const SedesSchoolPage: React.FC = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await axios.get('sedes-school');
+      const res = await axios.get('sedes-institucionales');
       setSedes(res.data.data || []);
     } catch (err: any) {
       setError(err?.response?.data?.message || 'Error al obtener las sedes');
@@ -59,7 +59,7 @@ const SedesSchoolPage: React.FC = () => {
 
   // 🔍 búsqueda
   const filteredSedes = sedes.filter((s) =>
-    s.nombreSede.toLowerCase().includes(searchText.toLowerCase())
+    s.nombre.toLowerCase().includes(searchText.toLowerCase())
   );
 
   // 📄 paginación
@@ -69,7 +69,7 @@ const SedesSchoolPage: React.FC = () => {
   const totalPages = Math.ceil(filteredSedes.length / ITEMS_PER_PAGE);
 
   // 🗑️ eliminar
-  const handleEliminar = async (s: SedeSchool) => {
+  const handleEliminar = async (s: SedeInstitucional) => {
     const theme = JSON.parse(localStorage.getItem('settings-configs') || '{}')?.themeMode;
     const isDarkMode = theme === 'dark';
     const background = isDarkMode ? '#1B1C22' : '#F9F9F9';
@@ -77,7 +77,7 @@ const SedesSchoolPage: React.FC = () => {
     const iconColor = isDarkMode ? 'white' : '#4B5675';
     const result = await Swal.fire({
       title: 'Eliminar sede',
-      text: `¿Deseas eliminar la sede "${s.nombreSede}"?`,
+      text: `¿Deseas eliminar la sede "${s.nombre}"?`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Sí, eliminar',
@@ -93,7 +93,7 @@ const SedesSchoolPage: React.FC = () => {
     if (!result.isConfirmed) return;
 
     try {
-      await axios.delete(`sedes-school/${s.id}`);
+      await axios.delete(`sedes-institucionales/${s.id}`);
       fetchSedes();
       Swal.fire('Eliminada', 'La sede fue eliminada correctamente', 'success');
     } catch (err: any) {
@@ -102,7 +102,7 @@ const SedesSchoolPage: React.FC = () => {
   };
 
   // ✏️ editar
-  const handleEditar = (s: SedeSchool) => {
+  const handleEditar = (s: SedeInstitucional) => {
     setSedeSeleccionada(s.id);
     setModalActualizarOpen(true);
   };
@@ -171,10 +171,10 @@ const SedesSchoolPage: React.FC = () => {
 
         {currentSedes.map((s) => (
           <div key={s.id} className="rounded-xl overflow-hidden border card flex flex-col">
-            <img src={s.rutaImagenUrl} alt={s.nombreSede} className="w-full h-40 object-cover" />
+            <img src={s.rutaImagenUrl} alt={s.nombre} className="w-full h-40 object-cover" />
 
             <div className="p-4 flex flex-col gap-2 flex-1">
-              <h3 className="font-semibold truncate">{s.nombreSede}</h3>
+              <h3 className="font-semibold truncate">{s.nombre}</h3>
               <p className="text-sm text-gray-600 line-clamp-2">
                 {s.descripcion || 'Sin descripción'}
               </p>
@@ -224,7 +224,7 @@ const SedesSchoolPage: React.FC = () => {
       )}
 
       {/* Modales */}
-      <ModalCrearSedeSchool
+      <ModalCrearSedeInstitucional
         open={modalCrearOpen}
         onClose={() => setModalCrearOpen(false)}
         onSave={() => {
@@ -234,7 +234,7 @@ const SedesSchoolPage: React.FC = () => {
       />
 
       {modalActualizarOpen && sedeSeleccionada && (
-        <ModalActualizarSedeSchool
+        <ModalActualizarSedeInstitucional
           open={modalActualizarOpen}
           sedeId={sedeSeleccionada.toString()}
           onClose={() => setModalActualizarOpen(false)}
@@ -248,4 +248,4 @@ const SedesSchoolPage: React.FC = () => {
   );
 };
 
-export default SedesSchoolPage;
+export default SedesInstitucionalePage;

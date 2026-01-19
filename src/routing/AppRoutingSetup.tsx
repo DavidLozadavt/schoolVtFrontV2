@@ -94,7 +94,7 @@ import MultimediaPage from '@/pages/multimedia/gestion-multimedia/MultimediaPage
 import ProfesoresPage from '@/pages/profesores/profes/ProfesoresPage';
 import PeriodosPage from '@/pages/periodos/PeriodosPage';
 import JornadasPage from '@/pages/gestion-jornadas/JornadasPage';
-import SedesSchoolPage from '@/pages/gestion-sede-school/SedesSchoolPage';
+import SedesInstitucionalePage from '@/pages/gestion-sede-institucionale/SedesInstitucionalePage';
 
 import DashboardCoordinador from '@/pages/cordinador/DashboardCordinador';
 import GestionProgramas from '@/pages/programas-academicos/GestionProgramas';
@@ -914,10 +914,10 @@ const AppRoutingSetup = (): ReactElement => {
             }
           />
           <Route
-            path="/gestion-academica/configuracion/sedes-school"
+            path="/gestion-academica/configuracion/sedes-institucionales"
             element={
               <ProtectedRoute requiredPermissions={['GESTION_USUARIO']}>
-                <SedesSchoolPage />
+                <SedesInstitucionalePage />
               </ProtectedRoute>
             }
           />
