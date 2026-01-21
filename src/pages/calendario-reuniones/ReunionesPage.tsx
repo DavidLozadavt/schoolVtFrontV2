@@ -1,11 +1,7 @@
-// 🖥️ ReunionesPage.tsx (Modificado)
 import React, { useState } from "react";
-// Importamos solo lo necesario de ListaReuniones
 import ListaReuniones from "./components/ListaReuniones"; 
 import { Task, exampleTasks } from "./types";
 
-// --- NUEVO COMPONENTE MODAL: NewMeetingModal (Renombrado Lógicamente a NewTaskModal) ---
-// Se mantiene la estructura para la funcionalidad de agregar tarea.
 const NewTaskModal: React.FC<{ isOpen: boolean, onClose: () => void }> = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
@@ -26,7 +22,6 @@ const NewTaskModal: React.FC<{ isOpen: boolean, onClose: () => void }> = ({ isOp
                     <input type="text" placeholder="Título de la Tarea" className="w-full p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
                     <input type="date" className="w-full p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
                     <input type="number" placeholder="Duración (minutos)" className="w-full p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
-                    {/* Se podría agregar selección de responsable o color aquí */}
                 </form>
                 
                 <div className="flex justify-end mt-6 space-x-3">
@@ -50,7 +45,6 @@ const NewTaskModal: React.FC<{ isOpen: boolean, onClose: () => void }> = ({ isOp
 };
 
 
-// 📅 NUEVO COMPONENTE: Vista de Calendario (Simulado)
 const CalendarView: React.FC<{ tasks: Task[] }> = ({ tasks }) => (
     <div className="flex flex-col h-full p-6 bg-white shadow-2xl dark:bg-gray-800 rounded-xl">
         <h3 className="mb-6 text-2xl font-extrabold text-gray-900 dark:text-gray-100">
@@ -60,9 +54,7 @@ const CalendarView: React.FC<{ tasks: Task[] }> = ({ tasks }) => (
             {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map(day => (
                 <div key={day} className="font-bold text-center text-gray-600 dark:text-gray-300">{day}</div>
             ))}
-            {/* Simulación de cuadrícula de calendario */}
             {Array(35).fill(null).map((_, i) => {
-                // Simplemente muestra las tareas de ejemplo en las primeras casillas
                 const task = tasks.find(t => parseInt(t.id) === i + 1);
                 return (
                     <div 
@@ -86,7 +78,6 @@ const CalendarView: React.FC<{ tasks: Task[] }> = ({ tasks }) => (
 );
 
 
-// 🖥️ COMPONENTE PRINCIPAL
 const ReunionesPage = () => {
   const [tasks] = useState<Task[]>(exampleTasks);
   const [isModalOpen, setIsModalOpen] = useState(false); 
@@ -96,10 +87,8 @@ const ReunionesPage = () => {
 
 
   return (
-    // Se mantiene el modo oscuro con bg-gray-100 y [--tw-page-bg-dark]
     <div className="flex flex-col min-h-screen gap-4 p-4 font-sans transition-colors bg-gray-100 lg:flex-row md:gap-6 md:p-6 dark:bg-[--tw-page-bg-dark]">
       
-      {/* --- LISTA IZQUIERDA: ListaReuniones (Ahora Lista de Tareas) --- */}
       <ListaReuniones 
         tasks={tasks}
         activeMeetingId={undefined} // Ya no hay "activa"

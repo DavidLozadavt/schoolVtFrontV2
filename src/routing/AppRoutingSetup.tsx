@@ -50,6 +50,7 @@ import CajaPage from '@/pages/puntos-de-venta/Caja/CajaPage';
 import PosTiendaPage from '@/pages/Pos/PosTiendaPage';
 import { PosPage } from '@/pages/Pos/components/PosPage';
 import { ConfiguracionEmpresaPage } from '@/pages/configuracion-empresa/ConfiguracionEmpresaPage';
+import MigracionDatosPage from '@/pages/migracion-datos/MigracionDatosPage';
 import { UsuariosPage } from '@/pages/usuarios/UsuariosPage';
 import { PerfilPage } from '@/pages/perfil/PerfilPage';
 import { TipoContratoPage } from '@/pages/tipo-contrato/TipoContratoPage';
@@ -94,6 +95,11 @@ import MultimediaPage from '@/pages/multimedia/gestion-multimedia/MultimediaPage
 import ProfesoresPage from '@/pages/profesores/profes/ProfesoresPage';
 import PeriodosPage from '@/pages/periodos/PeriodosPage';
 
+import DashboardCoordinador from '@/pages/cordinador/DashboardCordinador';
+import GestionProgramas from '@/pages/programas-academicos/GestionProgramas';
+import ProfesoresContent from '@/pages/profesores/profes/ProfesoresContent';
+import EstudiantesPage from '@/pages/estudiantes/EstudiantesPage';
+
 // Componentes temporales para pruebas
 
 const JornadasPage = () => (
@@ -107,9 +113,7 @@ const InfraestructuraPage = () => (
   </div>
 );
 
-import DashboardCoordinador from '@/pages/cordinador/DashboardCordinador';
-import GestionProgramas from '@/pages/programas-academicos/GestionProgramas';
-import ProfesoresContent from '@/pages/profesores/profes/ProfesoresContent';
+
 
 // Configuración de prioridades de Dashboards
 // El orden importa: el primero que coincida será el que se muestre.
@@ -132,11 +136,7 @@ const DASHBOARD_CONFIG = [
   },
   {
     permission: 'GESTION_ESTUDIANTE',
-    component: (
-      <div className="p-8">
-        <h2>Dashboard de Estudiante - Próximamente</h2>
-      </div>
-    )
+    component: <EstudiantesPage />
   }
 ];
 const AppRoutingSetup = (): ReactElement => {
@@ -706,6 +706,15 @@ const AppRoutingSetup = (): ReactElement => {
           />
 
           <Route
+            path="/empresa/migracion-datos"
+            element={
+              <ProtectedRoute requiredPermissions={['GESTION_CONFIGURACION_EMPRESA']}>
+                <MigracionDatosPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
             path="/gestion-vinculaciones/vinculaciones"
             element={
               <ProtectedRoute requiredPermissions={['GESTION_AFILIACIONES']}>
@@ -910,6 +919,14 @@ const AppRoutingSetup = (): ReactElement => {
             element={
               <ProtectedRoute requiredPermissions={['GESTION_PROFESOR']}>
                 <ProfesoresPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/estudiantes"
+            element={
+              <ProtectedRoute requiredPermissions={['GESTION_ESTUDIANTE']}>
+                <EstudiantesPage />
               </ProtectedRoute>
             }
           />
