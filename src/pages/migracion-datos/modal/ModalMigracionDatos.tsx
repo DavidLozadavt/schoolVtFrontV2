@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { Modal, ModalContent, ModalBody, ModalHeader, ModalTitle } from '@/components/modal';
 import { KeenIcon } from '@/components';
 import { useSnackbar } from 'notistack';
@@ -10,24 +11,61 @@ interface ModalProps {
   entity?: 'trabajadores' | 'estudiantes' | string;
 }
 
+const endpoints = {
+  trabajadores: {
+    upload: '/cargar-trabajadores',
+    procedure: '/ejecutarProcedimiento',
+  },
+  estudiantes: {
+    upload: '/cargar-estudiantes',
+    procedure: '/procedimientoEstudiantes',
+  },
+};
+
 const ModalMigracionDatos = ({ open, onClose, onSave, entity = 'trabajadores' }: ModalProps) => {
   const { enqueueSnackbar } = useSnackbar();
   const [file, setFile] = useState<File | null>(null);
 
   const label = entity === 'estudiantes' ? 'Estudiantes' : 'Trabajadores';
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!file) {
       enqueueSnackbar('Debes seleccionar un archivo', { variant: 'warning' });
       return;
     }
 
-    // Llamada al callback del padre (si existe)
-    onSave?.(file, entity);
+    try {
+      const config = endpoints[entity as 'trabajadores' | 'estudiantes'];
 
-    // Feedback y cierre
-    enqueueSnackbar(`Archivo cargado para ${label}`, { variant: 'success' });
-    onClose();
+      const formData = new FormData();
+      formData.append('file', file);
+
+      // 1️⃣ Cargar archivo
+      await axios.post(config.upload, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      // 2️⃣ Ejecutar procedimiento
+      await axios.post(config.procedure);
+
+      // callback opcional (por si el padre lo usa después)
+      onSave?.(file, entity);
+
+      enqueueSnackbar(`Proceso ejecutado correctamente para ${label}`, {
+        variant: 'success',
+      });
+
+      onClose();
+    } catch (error: any) {
+      console.error(error);
+
+      enqueueSnackbar(
+        error?.response?.data?.message || 'Error en la carga o ejecución del proceso',
+        { variant: 'error' }
+      );
+    }
   };
 
   return (
