@@ -80,17 +80,6 @@ const PeriodosContent: React.FC<PeriodosProps> = ({ reload = false }) => {
   const columns = useMemo<ColumnDef<Periodo>[]>(
     () => [
       {
-        accessorFn: (row) => row.id,
-        id: 'id',
-        header: () => 'Código',
-        enableSorting: true,
-        cell: (info) => <span className="text-gray-700">{info.row.original.id}</span>,
-        meta: {
-          className: 'w-[100px]',
-          cellClassName: 'text-gray-700 font-normal'
-        }
-      },
-      {
         accessorFn: (row) => row.nombrePeriodo,
         id: 'nombre',
         header: () => 'Nombre periodo',

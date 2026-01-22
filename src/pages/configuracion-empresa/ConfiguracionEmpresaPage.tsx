@@ -2,7 +2,10 @@ import { useAuthContext } from '@/auth';
 import { Container } from '@/components';
 import axios from 'axios';
 import { enqueueSnackbar } from 'notistack';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import ModalCorte from './ModalCorte';
+import { useConfirm } from '@/hooks';
+import { KeenIcon } from '@/components/keenicons';
 
 const ConfiguracionEmpresaPage = () => {
   const authContext = useAuthContext();
@@ -89,6 +92,138 @@ const ConfiguracionEmpresaPage = () => {
       [e.target.name]: numeric
     });
   };
+
+  // === Sección: Configuración de Cortes (estado local de ejemplo) ===
+  type Periodo = {
+    id: number;
+    nombrePeriodo: string;
+    fechaInicial: string;
+    fechaFinal: string;
+  };
+
+  interface Corte {
+    id: number;
+    detalle: string;
+    porcentaje: string;
+    fechaInicial: string;
+    fechaFinal: string;
+    periodo: {
+      nombrePeriodo: string;
+    };
+  }
+
+  const [periodos, setPeriodos] = useState<Periodo[]>([]);
+  const [selectedPeriodo, setSelectedPeriodo] = useState<string>('');
+  const [loadingPeriodos, setLoadingPeriodos] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const { confirmAction } = useConfirm();
+
+  const storageFilterId = 'proceso-filter';
+  const [cortes, setCortes] = useState<Corte[]>([]);
+  const [loadingCortes, setLoadingCortes] = useState(false);
+  const [editingCorte, setEditingCorte] = useState<Corte | null>(null);
+  const [selectedPeriodoObj, setSelectedPeriodoObj] = useState<Periodo | null>(null);
+
+  const getCortesPorPeriodo = async (idPeriodo: string) => {
+    if (!idPeriodo) {
+      setCortes([]);
+      return;
+    }
+
+    try {
+      setLoadingCortes(true);
+
+      const response = await axios.get(`/get_configuracion_cortes/${idPeriodo}`);
+
+      // 👇 TU API DEVUELVE { data: [...] }
+      setCortes(response.data.data);
+    } catch (error) {
+      console.error('Error trayendo cortes:', error);
+      setCortes([]);
+    } finally {
+      setLoadingCortes(false);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedPeriodo) {
+      getCortesPorPeriodo(selectedPeriodo);
+    } else {
+      setCortes([]);
+    }
+  }, [selectedPeriodo]);
+
+  const deleteCorte = (id: number) => {
+    confirmAction('¿Eliminar este corte permanentemente?', async () => {
+      try {
+        await axios.delete(`/configuracioncortes/${id}`);
+        setCortes((prev) => prev.filter((c) => c.id !== id));
+        enqueueSnackbar('Corte eliminado correctamente', { variant: 'success' });
+      } catch (error) {
+        console.error('Error al eliminar corte', error);
+        enqueueSnackbar('Error al eliminar corte', { variant: 'error' });
+      }
+    });
+  };
+
+  const [searchTerm, setSearchTerm] = useState(() => {
+    return localStorage.getItem(storageFilterId) || '';
+  });
+
+  const getPeriodos = async () => {
+    try {
+      setLoadingPeriodos(true);
+
+      const response = await axios.get('periodos');
+      setPeriodos(response.data);
+    } catch (error) {
+      console.error(error);
+      enqueueSnackbar('Error al cargar los periodos', { variant: 'error' });
+    } finally {
+      setLoadingPeriodos(false);
+    }
+  };
+
+  useEffect(() => {
+    getPeriodos();
+  }, []);
+
+  useEffect(() => {
+    if (!selectedPeriodo) {
+      setSelectedPeriodoObj(null);
+      return;
+    }
+
+    const idNum = Number(selectedPeriodo);
+    const found = periodos.find((p) => p.id === idNum);
+
+    if (found) {
+      setSelectedPeriodoObj(found);
+      return;
+    }
+
+    // Si por alguna razón no está en la lista `periodos`, pedimos uno al backend
+    const fetchPeriodo = async () => {
+      try {
+        const res = await axios.get(`periodos/${idNum}`);
+        // Ajusta según la forma que tu API devuelva el recurso
+        setSelectedPeriodoObj(res.data?.data ?? res.data ?? res.data?.periodo ?? res.data);
+      } catch (err) {
+        console.error('No se pudo obtener el periodo:', err);
+        setSelectedPeriodoObj(null);
+      }
+    };
+
+    fetchPeriodo();
+  }, [selectedPeriodo, periodos]);
+
+  // Calcular porcentaje restante del periodo (para mostrar en la fila del periodo
+  // y para pasar como valor por defecto al modal de crear corte).
+  const sumPorcentajes = cortes.reduce((acc, c) => {
+    const val = Number((c as any).porcentaje);
+    return acc + (isNaN(val) ? 0 : val);
+  }, 0);
+  const remainingPorcentaje = Math.max(0, 100 - sumPorcentajes);
 
   return (
     <Container>
@@ -414,6 +549,156 @@ const ConfiguracionEmpresaPage = () => {
               </div>
             </section>
 
+            {/* === SECCIÓN: Configuración de Cortes === */}
+            <section className="space-y-4">
+              <h2 className="text-lg font-semibold text-gray-800 border-b pb-2">
+                Configuración de Cortes
+              </h2>
+
+              <div className="grid grid-cols-1 lg:grid-cols-[65%_35%] gap-6 items-end">
+                <div>
+                  <h4 className="text-lg font-semibold text-gray-800 border-b pb-2">Periodo</h4>
+                  <select
+                    name="periodo"
+                    className="select"
+                    value={selectedPeriodo}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setSelectedPeriodo(value);
+                      // La carga de cortes la hace el useEffect que observa selectedPeriodo
+                    }}
+                  >
+                    <option value="">Seleccione periodo</option>
+
+                    {loadingPeriodos && <option disabled>Cargando periodos...</option>}
+
+                    {periodos.map((periodo) => (
+                      <option key={periodo.id} value={periodo.id}>
+                        {periodo.nombrePeriodo}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex gap-2 justify-end">
+                  <input
+                    type="text"
+                    placeholder="Buscar Periodo"
+                    className="input input-sm pl-8"
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="overflow-x-auto mt-4">
+                <table className="min-w-full text-left">
+                  <thead>
+                    <tr className="text-sm text-gray-700">
+                      <th className="px-4 py-2">Código</th>
+                      <th className="px-4 py-2">Periodo</th>
+                      <th className="px-4 py-2">Detalle</th>
+                      <th className="px-4 py-2">Fecha Inicial</th>
+                      <th className="px-4 py-2">Fecha Final</th>
+                      <th className="px-4 py-2">Porcentaje</th>
+                      <th className="px-4 py-2">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {loadingCortes && <tr></tr>}
+
+                    {/* Si no hay cortes y no hay periodo seleccionado */}
+                    {!loadingCortes && !selectedPeriodoObj && cortes.length === 0 && (
+                      <tr>
+                        <td colSpan={7} className="px-4 py-3 text-center">
+                          No hay cortes para este periodo
+                        </td>
+                      </tr>
+                    )}
+
+                    {/* Fila destacada del periodo seleccionado (si existe) */}
+                    {selectedPeriodoObj && (
+                      <tr
+                        key={`periodo-${selectedPeriodoObj.id}`}
+                        className="bg-gray-100 text-gray-800 font-semibold"
+                      >
+                        <td className="px-4 py-3">{selectedPeriodoObj.id}</td>
+                        <td className="px-4 py-3">{selectedPeriodoObj.nombrePeriodo}</td>
+                        <td className="px-4 py-3">corte</td>
+                        <td className="px-4 py-3">{selectedPeriodoObj.fechaInicial}</td>
+                        <td className="px-4 py-3">{selectedPeriodoObj.fechaFinal}</td>
+                        <td className="px-4 py-3">{remainingPorcentaje}</td>
+                        <td className="px-4 py-3"></td>
+                      </tr>
+                    )}
+
+                    {/* Si hay periodo pero no hay cortes, mostramos nota bajo la fila del periodo */}
+                    {!loadingCortes && selectedPeriodoObj && cortes.length === 0 && (
+                      <tr>
+                        <td colSpan={7} className="px-4 py-3 text-center text-sm text-gray-600">
+                          No hay cortes creados para este periodo aún
+                        </td>
+                      </tr>
+                    )}
+
+                    {/* Filas normales de cortes */}
+                    {!loadingCortes &&
+                      cortes.map((c, idx) => (
+                        <tr key={`corte-${c.id ?? idx}`} className="bg-white even:bg-gray-50">
+                          <td className="px-4 py-3">{c.id}</td>
+                          <td className="px-4 py-3">{c.periodo?.nombrePeriodo}</td>
+                          <td className="px-4 py-3">{c.detalle}</td>
+                          <td className="px-4 py-3">{c.fechaInicial}</td>
+                          <td className="px-4 py-3">{c.fechaFinal}</td>
+                          <td className="px-4 py-3">{c.porcentaje}</td>
+                          <td className="px-4 py-3">
+                            <div className="flex gap-2">
+                              <button
+                                type="button"
+                                className="btn btn-sm btn-icon btn-clear btn-light"
+                                onClick={() => {
+                                  setEditingCorte(c);
+                                  setModalOpen(true);
+                                }}
+                              >
+                                <KeenIcon icon="notepad-edit" />
+                              </button>
+                              <button
+                                type="button"
+                                className="btn btn-sm btn-icon btn-clear btn-light"
+                                onClick={() => deleteCorte(c.id)}
+                              >
+                                <KeenIcon icon="trash" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="pt-4">
+                <button
+                  type="button"
+                  className={`btn btn-primary ${!selectedPeriodo ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  onClick={() => {
+                    if (!selectedPeriodo) {
+                      enqueueSnackbar('Seleccione un periodo antes de añadir', {
+                        variant: 'warning'
+                      });
+                      return;
+                    }
+                    setModalOpen(true);
+                  }}
+                  disabled={!selectedPeriodo}
+                >
+                  + AÑADIR
+                </button>
+              </div>
+            </section>
+
             <div className="flex justify-end pt-4">
               <button type="submit" className="btn btn-primary px-8">
                 Guardar Cambios
@@ -422,6 +707,21 @@ const ConfiguracionEmpresaPage = () => {
           </div>
         </div>
       </form>
+
+      <ModalCorte
+        open={modalOpen}
+        periodoId={selectedPeriodo}
+        defaultPorcentaje={remainingPorcentaje}
+        corte={editingCorte ?? undefined}
+        onClose={() => {
+          setModalOpen(false);
+          setEditingCorte(null);
+        }}
+        onSave={() => {
+          if (selectedPeriodo) getCortesPorPeriodo(selectedPeriodo);
+          setEditingCorte(null);
+        }}
+      />
     </Container>
   );
 };
