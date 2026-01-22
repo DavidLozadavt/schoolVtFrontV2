@@ -25,6 +25,11 @@ export const MENU_SIDEBAR: TMenuConfig = [
         title: 'Infraestructura',
         path: '/gestion-academica/configuracion/infraestructura',
         requiredPermissions: ['GESTION_USUARIO']
+      },
+      {
+        title: 'Sedes Institucionales',
+        path: '/gestion-academica/configuracion/sedes-institucionales',
+        requiredPermissions: ['GESTION_USUARIO']
       }
     ]
   },
