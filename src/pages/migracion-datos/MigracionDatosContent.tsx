@@ -70,7 +70,7 @@ const MigracionDatosContent = () => {
         <div className="group relative w-full max-w-sm border-neutral-200 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 rounded-2xl shadow-lg overflow-hidden">
           <div className="h-52 w-full relative">
             <img
-              src="/images/estudiantes.jpg"
+              src="/media/images/Estudiantes.png"
               alt="Estudiantes"
               className="w-full h-full object-cover"
             />
