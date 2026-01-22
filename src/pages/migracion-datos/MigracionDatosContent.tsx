@@ -1,6 +1,8 @@
 import { Container } from '@/components';
 import { useState } from 'react';
 import { ModalMigracionDatos } from './modal/ModalMigracionDatos';
+import * as XLSX from 'xlsx';
+
 
 const MigracionDatosContent = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -14,9 +16,45 @@ const MigracionDatosContent = () => {
   };
 
   const handleDownload = (entity: 'trabajadores' | 'estudiantes') => {
-    // Aquí puedes invocar la lógica de descarga (ej. fetch a plantilla)
-    // Por ahora solo abre el modal como ejemplo:
-    openModalFor(entity);
+    const headers = [
+      'nombre1',
+      'nombre2',
+      'apellido1',
+      'apellido2',
+      'tipo_identificacion',
+      'identificacion',
+      'correo',
+      'celular',
+      'fecha_nacimiento',
+      'tipo_contratacion',
+      'valor',
+      'fecha_inicial',
+      'fecha_final',
+      'rol',
+    ];
+
+    // Fila vacía para los encabezados
+    const data = [Object.fromEntries(headers.map(h => [h, '']))];
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+
+    // AJUSTAR COLUMNAS AL TEXTO
+    worksheet['!cols'] = headers.map(h => ({
+      wch: Math.max(h.length + 2, 15),
+    }));
+
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+      workbook,
+      worksheet,
+      entity === 'trabajadores' ? 'Trabajadores' : 'Estudiantes'
+    );
+
+    XLSX.writeFile(
+      workbook,
+      `plantilla_${entity}.xlsx`
+    );
   };
 
   return (
