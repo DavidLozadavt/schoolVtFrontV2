@@ -38,7 +38,7 @@ const ModalMigracionDatos = ({ open, onClose, onSave, entity = 'trabajadores' }:
       const config = endpoints[entity as 'trabajadores' | 'estudiantes'];
 
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('archivo', file);
 
       // 1️⃣ Cargar archivo
       await axios.post(config.upload, formData, {
