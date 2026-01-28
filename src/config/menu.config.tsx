@@ -4,32 +4,32 @@ export const MENU_SIDEBAR: TMenuConfig = [
   {
     title: 'Gestión Académica',
     icon: 'teacher',
-    requiredPermissions: ['GESTION_USUARIO'],
+    requiredPermissions: ['GESTION_ACADEMICA'],
     children: [
       {
         title: 'Gestión Programas',
         path: '/gestion-academica/configuracion/programas',
-        requiredPermissions: ['GESTION_USUARIO']
+        requiredPermissions: ['GESTION_ACADEMICA']
       },
       {
         title: 'Periodos',
         path: '/gestion-academica/configuracion/periodos',
-        requiredPermissions: ['GESTION_USUARIO']
+        requiredPermissions: ['GESTION_ACADEMICA']
       },
       {
         title: 'Jornadas',
         path: '/gestion-academica/configuracion/jornadas',
-        requiredPermissions: ['GESTION_USUARIO']
+        requiredPermissions: ['GESTION_ACADEMICA']
       },
       {
         title: 'Infraestructura',
         path: '/gestion-academica/configuracion/infraestructura',
-        requiredPermissions: ['GESTION_USUARIO']
+        requiredPermissions: ['GESTION_ACADEMICA']
       },
       {
         title: 'Sedes Institucionales',
         path: '/gestion-academica/configuracion/sedes-institucionales',
-        requiredPermissions: ['GESTION_USUARIO']
+        requiredPermissions: ['GESTION_ACADEMICA']
       }
     ]
   },

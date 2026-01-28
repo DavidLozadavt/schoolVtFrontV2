@@ -781,7 +781,7 @@ const AppRoutingSetup = (): ReactElement => {
           <Route
             path="/gestion-academica/configuracion/programas"
             element={
-              <ProtectedRoute requiredPermissions={['GESTION_USUARIO']}>
+              <ProtectedRoute requiredPermissions={['GESTION_ACADEMICA']}>
                 <GestionProgramas />
               </ProtectedRoute>
             }
@@ -790,7 +790,7 @@ const AppRoutingSetup = (): ReactElement => {
           <Route
             path="/gestion-academica/configuracion/periodos"
             element={
-              <ProtectedRoute requiredPermissions={['GESTION_USUARIO']}>
+              <ProtectedRoute requiredPermissions={['GESTION_ACADEMICA']}>
                 <PeriodosPage />
               </ProtectedRoute>
             }
@@ -798,7 +798,7 @@ const AppRoutingSetup = (): ReactElement => {
           <Route
             path="/gestion-academica/configuracion/infraestructura"
             element={
-              <ProtectedRoute requiredPermissions={['GESTION_USUARIO']}>
+              <ProtectedRoute requiredPermissions={['GESTION_ACADEMICA']}>
                 <InfraestructuraPage />
               </ProtectedRoute>
             }
@@ -806,7 +806,7 @@ const AppRoutingSetup = (): ReactElement => {
           <Route
             path="/gestion-academica/configuracion/jornadas"
             element={
-              <ProtectedRoute requiredPermissions={['GESTION_USUARIO']}>
+              <ProtectedRoute requiredPermissions={['GESTION_ACADEMICA']}>
                 <JornadasPage />
               </ProtectedRoute>
             }
@@ -926,7 +926,7 @@ const AppRoutingSetup = (): ReactElement => {
           <Route
             path="/gestion-academica/configuracion/sedes-institucionales"
             element={
-              <ProtectedRoute requiredPermissions={['GESTION_USUARIO']}>
+              <ProtectedRoute requiredPermissions={['GESTION_ACADEMICA']}>
                 <SedesInstitucionalePage />
               </ProtectedRoute>
             }

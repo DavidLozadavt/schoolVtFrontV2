@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { MallaCurricularProps, RecursoItem } from '../../types';
 import AsignarMateria from './AsignarMateria';
@@ -27,75 +27,101 @@ export const MallaCurricular = ({ isOpen, onClose, program }: MallaCurricularPro
   const [isMateriaModalOpen, setIsMateriaModalOpen] = useState(false);
   const [selectedNivelId, setSelectedNivelId] = useState('');
 
-  useEffect(() => {
-    const fetchConfiguracion = async () => {
-      if (isOpen && program?.id) {
-        setLoading(true);
-        try {
-          const response = await axios.get(`/asignacion_detalle_completo/${program.id}`);
-          const { data } = response.data;
-          setRecursos(data.recursos);
+  // --- FUNCIÓN PARA CARGAR LA MALLA DESDE LA API ---
+  const fetchMallaExistente = useCallback(async () => {
+    if (!program?.id) return;
+    try {
+      setLoading(true);
+      const response = await axios.get(`/asignacion_detalle_completo/${program.id}`);
+      const { data } = response.data;
+      setRecursos(data.recursos);
 
-          if (data.detalle) {
-            setSelectedPeriodo(data.detalle.idPeriodo);
+      if (data.detalle) {
+        setSelectedPeriodo(data.detalle.idPeriodo);
+        const gradoId = data.idTipoGradoAsignado || data.detalle.programa.idTipoGrado || '';
+        setSelectedTipoGrado(gradoId);
+        setIsGradoDisabled(!!gradoId);
 
-            const gradoId = data.idTipoGradoAsignado || data.detalle.programa.idTipoGrado || '';
-            setSelectedTipoGrado(gradoId);
-            
-            if (data.idTipoGradoAsignado) {
-              setIsGradoDisabled(true);
-            } else {
-              setIsGradoDisabled(false);
-            }
+        if (data.detalle.jornadas?.length > 0) {
+          setSelectedJornada(data.detalle.jornadas[0].id);
+        }
 
-            if (data.detalle.jornadas?.length > 0) {
-              setSelectedJornada(data.detalle.jornadas[0].id);
-            }
-          }
-        } catch (error: any) {
-          setErrorApi("Error al cargar recursos");
-        } finally {
-          setLoading(false);
+        // Mapear los grados registrados en la tabla grado_programas
+        if (data.detalle.programa.grado_programa) {
+          const mallasCargadas = data.detalle.programa.grado_programa.map((gp: any) => ({
+            id: gp.id, // ID real de la tabla gradoPrograma
+            nombre: gp.grado.nombreGrado, // ej: "PRIMER"
+            etiqueta: `A${gp.grado.numeroGrado}`, // ej: "A1"
+            jornadaId: data.detalle.jornadas[0]?.id || ''
+          }));
+          setNiveles(mallasCargadas);
         }
       }
-    };
-    fetchConfiguracion();
-  }, [isOpen, program?.id]);
+    } catch (error: any) {
+      setErrorApi("Error al cargar recursos");
+    } finally {
+      setLoading(false);
+    }
+  }, [program?.id]);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchMallaExistente();
+    }
+  }, [isOpen, fetchMallaExistente]);
 
   const handleOpenMateria = (nivelId: string) => {
     setSelectedNivelId(nivelId);
     setIsMateriaModalOpen(true);
   };
 
-  const agregarNivelAMalla = () => {
-    if (!selectedPeriodo || !selectedJornada) {
-      alert("Seleccione un periodo y una jornada antes de agregar.");
+  // --- FUNCIÓN PARA GUARDAR EN BD AL DAR CLIC EN "+" ---
+  const agregarNivelAMalla = async () => {
+    if (!selectedTipoGrado || !program?.id) {
+      alert("Error: El programa no tiene un tipo de grado asignado.");
       return;
     }
 
-    const periodoNombre = recursos?.periodos.find(p => p.id == selectedPeriodo)?.nombre;
-    const jornadaNombre = recursos?.jornadas_disponibles.find(j => j.id == selectedJornada)?.nombre;
+    try {
+      setLoading(true);
+      // Enviamos el idTipoGrado (SEMESTRE/AÑO) y el backend busca el siguiente idGrado real
+      const response = await axios.post('/grado_programas_store', {
+        idPrograma: program.id,
+        idTipoGrado: selectedTipoGrado,
+        numeroGrado: niveles.length + 1
+      });
 
-    const nuevoNivel = {
-      id: `M${niveles.length + 1}`,
-      nombre: `Nivel Académico - ${periodoNombre}`,
-      infoSub: `Jornada: ${jornadaNombre}`,
-      periodoId: selectedPeriodo,
-      jornadaId: selectedJornada
-    };
-
-    setNiveles([...niveles, nuevoNivel]);
+      if (response.data.status === 'success') {
+        await fetchMallaExistente(); // Recargamos para ver la nueva tarjeta
+      }
+    } catch (error: any) {
+      console.error("Error al guardar nivel:", error);
+      alert(error.response?.data?.message || "Error al sincronizar con el servidor.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const quitarNivel = () => {
-    if (niveles.length > 0) setNiveles(niveles.slice(0, -1));
+  const quitarNivel = async () => {
+    if (niveles.length === 0) return;
+    const ultimoNivel = niveles[niveles.length - 1];
+    
+    if (window.confirm("¿Desea eliminar este nivel de la base de datos?")) {
+      try {
+        setLoading(true);
+        await axios.delete(`/grado_programas/${ultimoNivel.id}`);
+        await fetchMallaExistente();
+      } catch (error) {
+        alert("No se pudo eliminar el nivel. Verifique si tiene materias asociadas.");
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
   if (!isOpen || !program) return null;
 
   const nombreGradoActual = recursos?.tipos_grado.find(t => t.id == selectedTipoGrado)?.nombre || 'SIN ASIGNAR';
-
-  // Clase común para los selectores en modo oscuro
   const selectDarkClass = "p-0 font-extrabold bg-transparent border-none focus:ring-0 text-2sm dark:text-white dark:[color-scheme:dark]";
 
   return (
@@ -169,7 +195,7 @@ export const MallaCurricular = ({ isOpen, onClose, program }: MallaCurricularPro
                 </div>
               </div>
 
-              {/* Select Tipo de Grado */}
+              {/* Select Tipo de Grado (Bloqueado por defecto) */}
               <div className="flex items-center gap-3 px-2 border-gray-200 sm:border-l dark:border-gray-dark-300">
                 <div className="flex flex-col w-full">
                   <label className="font-bold text-gray-500 uppercase text-3xs">Grado</label>
@@ -177,7 +203,7 @@ export const MallaCurricular = ({ isOpen, onClose, program }: MallaCurricularPro
                     value={selectedTipoGrado}
                     onChange={(e) => setSelectedTipoGrado(e.target.value)}
                     disabled={isGradoDisabled}
-                    className={`${selectDarkClass} uppercase ${isGradoDisabled ? 'text-gray-400 cursor-not-allowed opacity-70' : 'text-primary'}`}
+                    className={`${selectDarkClass} uppercase ${isGradoDisabled ? 'text-gray-600 cursor-not-allowed opacity-70' : 'text-primary'}`}
                   >
                     <option value="" className="dark:bg-coal-500">SELECCIONE...</option>
                     {recursos?.tipos_grado.map(t => (
@@ -199,12 +225,12 @@ export const MallaCurricular = ({ isOpen, onClose, program }: MallaCurricularPro
             </div>
           </div>
 
-          {/* Grid de Tarjetas (Malla) */}
+          {/* Grid de Tarjetas (Cargadas dinámicamente) */}
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {niveles.map((nivel) => (
               <div key={nivel.id} className="p-5 transition-colors bg-white border border-gray-400 shadow-sm dark:bg-coal-300 rounded-xl animate-fade-in-up hover:border-primary">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-2xl italic font-black text-primary opacity-30">{nivel.id}</span>
+                  <span className="text-4xl italic font-black text-primary opacity-30">{nivel.etiqueta}</span>
                   <span className="text-[10px] font-black text-primary bg-primary/10 px-2 py-0.5 rounded uppercase">
                     {nivel.jornadaId ? recursos?.jornadas_disponibles.find(j => j.id == nivel.jornadaId)?.nombre : ''}
                   </span>
@@ -214,7 +240,7 @@ export const MallaCurricular = ({ isOpen, onClose, program }: MallaCurricularPro
                 </h4>
 
                 <div className="p-3 mb-4 border border-gray-300 border-dashed rounded-lg bg-gray-50 dark:bg-coal-400">
-                  <p className="italic font-medium text-center text-gray-600 text-2xs dark:text-gray-500">Sin materias asignadas</p>
+                  <p className="italic font-medium text-center text-gray-600 text-2xs dark:text-gray-500">Sincronizado con Base de Datos</p>
                 </div>
 
                 <button
@@ -237,9 +263,9 @@ export const MallaCurricular = ({ isOpen, onClose, program }: MallaCurricularPro
 
         {/* Footer */}
         <div className="flex items-center justify-between p-4 px-6 bg-white border-t border-gray-300 dark:bg-coal-400">
-          <p className="italic font-bold text-gray-500 uppercase text-3xs">Se guardarán {niveles.length} niveles configurados.</p>
+          <p className="italic font-bold text-gray-500 uppercase text-3xs">Total: {niveles.length} niveles en BD.</p>
           <button onClick={onClose} className="px-10 py-2.5 bg-primary text-white rounded-lg text-3xs font-black uppercase shadow-lg hover:bg-primary-active active:scale-95 transition-all">
-            Guardar Configuración
+            Finalizar
           </button>
         </div>
       </div>
