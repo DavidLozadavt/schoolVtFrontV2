@@ -4,29 +4,44 @@ import { Modal, ModalContent, ModalBody, ModalHeader, ModalTitle } from '@/compo
 import { KeenIcon } from '@/components';
 import { useSnackbar } from 'notistack';
 
+// Definimos endpoints por entidad
+const ENDPOINTS: Record<string, { upload: string; procedure: string }> = {
+  trabajadores: {
+    upload: '/cargar-trabajadores',
+    procedure: '/ejecutarProcedimiento'
+  },
+  estudiantes: {
+    upload: '/cargar-estudiantes',
+    procedure: '/procedimientoEstudiantes'
+  },
+  productos: {
+    upload: '/cargar-productos',
+    procedure: '/procedimientoProductos'
+  },
+  infraestructura: {
+    upload: '/cargar-infraestructura',
+    procedure: '/procedimientoInfraestructura'
+  }
+};
+
 interface ModalProps {
   open: boolean;
   onClose: () => void;
   onSave?: (file: File | null, entity?: string) => void;
-  entity?: 'trabajadores' | 'estudiantes' | string;
+  entity?: string; // cualquier entidad
 }
-
-const endpoints = {
-  trabajadores: {
-    upload: '/cargar-trabajadores',
-    procedure: '/ejecutarProcedimiento',
-  },
-  estudiantes: {
-    upload: '/cargar-estudiantes',
-    procedure: '/procedimientoEstudiantes',
-  },
-};
 
 const ModalMigracionDatos = ({ open, onClose, onSave, entity = 'trabajadores' }: ModalProps) => {
   const { enqueueSnackbar } = useSnackbar();
   const [file, setFile] = useState<File | null>(null);
 
-  const label = entity === 'estudiantes' ? 'Estudiantes' : 'Trabajadores';
+  const label = entity?.charAt(0).toUpperCase() + entity?.slice(1);
+
+  // 🔹 Resetear archivo cuando se abre o cierra el modal
+  React.useEffect(() => {
+    if (!open) setFile(null); // se cierra modal → limpiar archivo
+    if (open) setFile(null); // se abre modal → iniciar vacío
+  }, [open, entity]);
 
   const handleSave = async () => {
     if (!file) {
@@ -34,33 +49,29 @@ const ModalMigracionDatos = ({ open, onClose, onSave, entity = 'trabajadores' }:
       return;
     }
 
+    const config = ENDPOINTS[entity];
+    if (!config) {
+      enqueueSnackbar('Entidad no válida', { variant: 'error' });
+      return;
+    }
+
     try {
-      const config = endpoints[entity as 'trabajadores' | 'estudiantes'];
-
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('archivo', file);
 
-      // 1️⃣ Cargar archivo
       await axios.post(config.upload, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      // 2️⃣ Ejecutar procedimiento
       await axios.post(config.procedure);
 
-      // callback opcional (por si el padre lo usa después)
-      onSave?.(file, entity);
+      enqueueSnackbar(`Archivo cargado correctamente para ${label}`, { variant: 'success' });
 
-      enqueueSnackbar(`Proceso ejecutado correctamente para ${label}`, {
-        variant: 'success',
-      });
+      onSave?.(file, entity);
 
       onClose();
     } catch (error: any) {
       console.error(error);
-
       enqueueSnackbar(
         error?.response?.data?.message || 'Error en la carga o ejecución del proceso',
         { variant: 'error' }
@@ -88,23 +99,21 @@ const ModalMigracionDatos = ({ open, onClose, onSave, entity = 'trabajadores' }:
 
         <ModalBody>
           <div className="mb-6">
-            <label className="block text-gray-700 font-medium mb-2">Archivo</label>
-
+            <label className="block text-gray-700 font-medium mb-2">Archivo Excel</label>
             <div className="flex items-center gap-3 bg-gray-100 rounded-lg px-4 py-2">
               <input
                 type="file"
                 className="hidden"
                 id="fileUpload"
+                accept=".xlsx,.xls"
                 onChange={(e) => setFile(e.target.files?.[0] || null)}
               />
-
               <label
                 htmlFor="fileUpload"
                 className="cursor-pointer bg-white border px-4 py-2 rounded-md text-sm shadow"
               >
                 Seleccionar archivo
               </label>
-
               <span className="text-sm text-gray-500 truncate">
                 {file ? file.name : 'Sin archivos seleccionados'}
               </span>
@@ -117,9 +126,8 @@ const ModalMigracionDatos = ({ open, onClose, onSave, entity = 'trabajadores' }:
             <button className="btn btn-sm btn-secondary" onClick={onClose}>
               CANCELAR
             </button>
-
             <button type="button" className="btn btn-sm btn-primary" onClick={handleSave}>
-              ACEPTAR
+              SUBIR
             </button>
           </div>
         </ModalBody>
